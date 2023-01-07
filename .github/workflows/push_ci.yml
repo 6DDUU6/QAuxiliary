@@ -87,9 +87,9 @@ jobs:
           echo "APK_FILE_UNIVERSAL=$(find app/build/outputs/ci -name '*universal.apk')" >> $GITHUB_ENV
         env:
           KEYSTORE_PATH: "../key2.jks"
-          KEYSTORE_PASSWORD: "dwg0417"
-          KEY_ALIAS: "key2"
-          KEY_PASSWORD: "dwg0417"
+          KEYSTORE_PASSWORD: ${{ secrets.SIGN_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.SIGN_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.SIGN_KEY_PASSWORD }}
 
       - name: Show Artifacts MD5
         run: |
