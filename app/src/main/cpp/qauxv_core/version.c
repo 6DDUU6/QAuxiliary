@@ -4,12 +4,12 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#if defined(__aarch64__) || defined(__x86_64__)
-const char so_interp[] __attribute__((used, section(".interp"))) = "/system/bin/linker64";
-#elif defined(__i386__) || defined(__arm__)
-const char so_interp[] __attribute__((used, section(".interp"))) = "/system/bin/linker";
+#if defined(__LP64__)
+const char so_interp[] __attribute__((used, section(".interp"), visibility("default"))) = "/system/bin/linker64";
+_Static_assert(sizeof(void *) == 8, "sizeof(void *) != 8");
 #else
-#error Unknown Arch
+const char so_interp[] __attribute__((used, section(".interp"), visibility("default"))) = "/system/bin/linker";
+_Static_assert(sizeof(void *) == 4, "sizeof(void *) != 4");
 #endif
 
 #ifndef QAUXV_VERSION
@@ -19,7 +19,7 @@ const char so_interp[] __attribute__((used, section(".interp"))) = "/system/bin/
 __attribute__((used, noreturn, section(".entry_init")))
 void __libqauxv_main(void) {
     printf("QAuxiliary libqauxv.so version " QAUXV_VERSION ".\n"
-           "Copyright (C) 2019-2022 qwq233@qwq2333.top\n"
+           "Copyright (C) 2019-2023 QAuxiliary developers\n"
            "This software is distributed in the hope that it will be useful,\n"
            "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
            "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n");
