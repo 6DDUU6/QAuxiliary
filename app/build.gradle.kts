@@ -208,8 +208,8 @@ dependencies {
     implementation(libs.material.dialogs.core)
     implementation(libs.material.dialogs.input)
     implementation(libs.ezXHelper)
-    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.2")
-    implementation("com.google.code.gson:gson:2.6.2")
+    implementation(libs.okhttp)
+    implementation(libs.gson)
     // festival title
     implementation(libs.confetti)
     implementation(libs.weatherView)
