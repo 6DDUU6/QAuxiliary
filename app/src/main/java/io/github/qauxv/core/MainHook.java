@@ -26,6 +26,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import cc.ioctl.hook.PacketHook;
 import cc.ioctl.hook.experimental.FileRecvRedirect;
 import cc.ioctl.hook.experimental.ForcePadMode;
 import cc.ioctl.hook.chat.GagInfoDisclosure;
@@ -149,6 +150,7 @@ public class MainHook {
                 InjectDelayableHooks.step(dir);
             }
         }
+        PacketHook.INSTANCE.checkAndInit();
     }
 
     private static boolean isForegroundStartupForMainProcess(Context ctx, Object step) {

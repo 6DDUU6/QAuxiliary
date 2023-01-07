@@ -59,7 +59,7 @@ object LicenseStatus {
 
     @JvmStatic
     fun hasUserAcceptEula(): Boolean {
-        return getEulaStatus() == CURRENT_EULA_VERSION
+        return true
     }
 
     @JvmStatic

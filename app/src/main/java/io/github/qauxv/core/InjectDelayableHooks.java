@@ -33,6 +33,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.view.ViewCompat;
 import cc.ioctl.hook.SettingEntryHook;
+import cc.ioctl.hook.SettingMcEntryHook;
 import cc.ioctl.util.LayoutHelper;
 import cc.ioctl.util.Reflex;
 import cc.ioctl.util.ui.drawable.ProportionDrawable;
@@ -219,6 +220,7 @@ public class InjectDelayableHooks {
         } else {
             SettingEntryHook.INSTANCE.initialize();
         }
+        SettingMcEntryHook.INSTANCE.initialize();
         if (ctx != null && main[0] != null) {
             System.gc();
             ctx.runOnUiThread(() -> ((ViewGroup) ctx.getWindow().getDecorView()).removeView(overlay[0]));
