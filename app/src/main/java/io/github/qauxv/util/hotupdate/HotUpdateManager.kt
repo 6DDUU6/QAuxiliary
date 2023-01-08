@@ -1,6 +1,6 @@
 /*
  * QAuxiliary - An Xposed module for QQ/TIM
- * Copyright (C) 2019-2022 qwq233@qwq2333.top
+ * Copyright (C) 2019-2023 QAuxiliary developers
  * https://github.com/cinit/QAuxiliary
  *
  * This software is non-free but opensource software: you can redistribute it
@@ -20,33 +20,27 @@
  * <https://github.com/cinit/QAuxiliary/blob/master/LICENSE.md>.
  */
 
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+package io.github.qauxv.util.hotupdate
 
-plugins {
-    `kotlin-dsl`
-}
+import io.github.qauxv.config.ConfigManager
 
-group = "io.github.qauxv.buildLogic"
+object HotUpdateManager {
 
-repositories {
-    google()
-    gradlePluginPortal()
-    mavenCentral()
-}
+    const val KEY_HOT_UPDATE_CHANNEL = "KEY_HOT_UPDATE_CHANNEL"
 
-dependencies {
-    implementation(libs.android.tools)
-    implementation(libs.kotlin.gradle)
-    implementation(libs.eclipse.jgit)
-}
+    const val CHANNEL_DISABLED = 0
+    const val CHANNEL_STABLE = 1
+    const val CHANNEL_BETA = 3
+    const val CHANNEL_CANARY = 4
 
-java {
-    targetCompatibility = JavaVersion.VERSION_11
-    sourceCompatibility = JavaVersion.VERSION_11
-}
+    var currentChannel: Int
+        get() = ConfigManager.getDefaultConfig().getIntOrDefault(KEY_HOT_UPDATE_CHANNEL, CHANNEL_DISABLED)
+        set(value) {
+            check(value in CHANNEL_DISABLED..CHANNEL_CANARY)
+            ConfigManager.getDefaultConfig().putInt(KEY_HOT_UPDATE_CHANNEL, value)
+        }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        jvmTarget = "11"
-    }
+    val isHotUpdateEnabled: Boolean
+        get() = currentChannel > 0
+
 }

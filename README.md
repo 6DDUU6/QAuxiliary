@@ -18,7 +18,7 @@ QAuxiliary 是一个基于 QNotified 的开源 Xposed 模块
 激活本模块后，在 QQ 或者 TIM 自带设置中点击 QAuxiliary 即可进入设置页面
 
 - Android >= 7.0
-- QQ >= 8.0.0, TIM >= 2.2.0, QQLite >= 4.0, QQ HD >= 5.9.3
+- QQ >= 8.2.0, TIM >= 2.2.0, QQLite >= 4.0, QQ HD >= 5.9.3
 
 ## 一切开发旨在学习，请勿用于非法用途
 
@@ -79,7 +79,7 @@ QAuxiliary 将为分 `CI` 和 `推荐的CI` 两个版本
 
 3. [![GitHub release](https://img.shields.io/github/release/cinit/QAuxiliary.svg)](https://github.com/cinit/QAuxiliary/releases/latest) 将只发布 `推荐的CI` 版更新。
 
-4. [![](https://img.shields.io/badge/LSPosed-ClickMe-blue?link=https://github.com/Xposed-Modules-Repo/io.github.qauxv/releases/)](https://github.com/Xposed-Modules-Repo/io.github.qauxv/releases/) 将发布所有版本更新，其中`CI`版本更新将被标注为 Pre-release。
+4. [![](https://img.shields.io/badge/LSPosed-ClickMe-blue?link=https://github.com/Xposed-Modules-Repo/io.github.qauxv/releases/)](https://github.com/Xposed-Modules-Repo/io.github.qauxv/releases/) 将只发布 `推荐的CI` 版更新。
 </details>
 
 ## 不会支持的功能
