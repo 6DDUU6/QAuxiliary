@@ -369,16 +369,22 @@ object CFrameControllerInjectImpl : DexKitTarget.UsingStr() {
     override val filter = DexKitFilter.strInClsName("com/tencent/mobileqq/activity/framebusiness/controllerinject/")
 }
 
+object ForwardSendPicUtil : DexKitTarget.UsingStr() {
+    override val declaringClass = "com/tencent/mobileqq/utils/ForwardSendPicUtil"
+    override val traitString = arrayOf("ForwardSendPicUtil")
+    override val filter = DexKitFilter.allowAll
+}
+
 object NBaseChatPie_init : DexKitTarget.UsingStr() {
     override val findMethod: Boolean = true
-    override val declaringClass: String = _BaseChatPie().name
+    override val declaringClass: String = _BaseChatPie()?.name ?: "com.tencent.mobileqq.activity.BaseChatPie"
     override val traitString = arrayOf("input set error", ", mDefautlBtnLeft: ")
     override val filter = DexKitFilter.strInClsName(declaringClass.replace('.', '/'))
 }
 
 object NBaseChatPie_createMulti : DexKitTarget.UsingStr() {
     override val findMethod: Boolean = true
-    override val declaringClass: String = _BaseChatPie().name
+    override val declaringClass: String = _BaseChatPie()?.name ?: "com.tencent.mobileqq.activity.BaseChatPie"
     override val traitString = arrayOf("^createMulti$")
     override val filter = DexKitFilter.strInClsName("com/tencent/mobileqq/activity/aio/helper") or
         DexKitFilter.defpackage or
@@ -391,7 +397,7 @@ object NBaseChatPie_createMulti : DexKitTarget.UsingStr() {
 
 object NBaseChatPie_chooseMsg : DexKitTarget.UsingStr() {
     override val findMethod: Boolean = true
-    override val declaringClass: String = _BaseChatPie().name
+    override val declaringClass: String = _BaseChatPie()?.name ?: "com.tencent.mobileqq.activity.BaseChatPie"
     override val traitString = arrayOf("set left text from cancel")
     override val filter = DexKitFilter.strInClsName(declaringClass.replace('.', '/'))
 }
@@ -481,7 +487,7 @@ object NVipUtils_getPrivilegeFlags : DexKitTarget.UsingStr() {
 
 object NTroopChatPie_showNewTroopMemberCount : DexKitTarget.UsingStr() {
     override val findMethod: Boolean = true
-    override val declaringClass: String = _TroopChatPie().name
+    override val declaringClass: String = _TroopChatPie()?.name ?: "com.tencent.mobileqq.activity.aio.core.TroopChatPie"
     override val traitString = arrayOf("showNewTroopMemberCount info is null")
     override val filter = filter@{ it: DexMethodDescriptor ->
         val m = kotlin.runCatching { it.getMethodInstance(getHostClassLoader()) }.getOrNull() ?: return@filter false
@@ -498,7 +504,7 @@ object NConversation_onCreate : DexKitTarget.UsingStr() {
 
 object NBaseChatPie_mosaic : DexKitTarget.UsingStr() {
     override val findMethod: Boolean = true
-    override val declaringClass: String = _BaseChatPie().name
+    override val declaringClass: String = _BaseChatPie()?.name ?: "com.tencent.mobileqq.activity.aio.core.BaseChatPie"
     override val traitString = arrayOf("enableMosaicEffect")
     override val filter = DexKitFilter.strInClsName(declaringClass.replace('.', '/'))
 }
@@ -596,6 +602,7 @@ object NCustomWidgetUtil_updateCustomNoteTxt : DexKitTarget.UsingStr() {
                 && m.parameterTypes[0] == TextView::class.java && m.paramCount == 6
         }
 }
+
 object NPadUtil_initDeviceType : DexKitTarget.UsingStr() {
     override val findMethod: Boolean = true
     override val declaringClass = "com.tencent.common.config.PadUtil"
@@ -626,5 +633,12 @@ object PaiYiPaiHandler_canSendReq : DexKitTarget.UsingStr() {
     override val findMethod: Boolean = true
     override val declaringClass = "com/tencent/mobileqq/paiyipai/PaiYiPaiHandler"
     override val traitString = arrayOf("pai_yi_pai_user_double_tap_timestamp_")
+    override val filter = DexKitFilter.allowAll
+}
+
+object TroopGuildChatPie_flingRToL : DexKitTarget.UsingStr() {
+    override val findMethod: Boolean = true
+    override val declaringClass = "com.tencent.mobileqq.troop.guild.TroopGuildChatPie"
+    override val traitString = arrayOf("[flingRToL] isMultiSelectState:")
     override val filter = DexKitFilter.allowAll
 }
