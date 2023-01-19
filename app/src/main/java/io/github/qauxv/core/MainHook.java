@@ -27,6 +27,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import cc.ioctl.hook.PacketHook;
+import cc.ioctl.hook.SettingMcEntryHook;
 import cc.ioctl.hook.experimental.FileRecvRedirect;
 import cc.ioctl.hook.experimental.ForcePadMode;
 import cc.ioctl.hook.chat.GagInfoDisclosure;
@@ -138,6 +139,7 @@ public class MainHook {
                     Object dir = getStartDirector(param.thisObject);
                     if (safeMode) {
                         SettingEntryHook.INSTANCE.initialize();
+                        SettingMcEntryHook.INSTANCE.initialize();
                     } else {
                         InjectDelayableHooks.step(dir);
                     }
