@@ -247,6 +247,7 @@ public class InjectDelayableHooks {
         } else {
             SettingEntryHook.INSTANCE.initialize();
         }
+        SettingMcEntryHook.INSTANCE.initialize();
     }
 
     public static void doInitDelayableHooksMP() {
