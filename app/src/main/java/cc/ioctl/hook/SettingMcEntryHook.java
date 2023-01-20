@@ -33,6 +33,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Looper;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -43,8 +44,12 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 
 import androidx.appcompat.app.AlertDialog;
+import io.github.qauxv.core.HookInstaller;
+import io.github.qauxv.fragment.FuncStatusDetailsFragment;
+import io.github.qauxv.util.Initiator;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 import cc.ioctl.util.HostInfo;
@@ -87,8 +92,13 @@ public class SettingMcEntryHook extends BasePersistBackgroundHook {
 
     @Override
     public boolean initOnce() throws Exception {
-        Class<?> kQQSettingSettingActivity = loadClass("com.tencent.mobileqq.activity.QQSettingSettingActivity");
-        XposedHelpers.findAndHookMethod(kQQSettingSettingActivity, "doOnCreate", Bundle.class, mAddModuleEntry);
+        XposedHelpers.findAndHookMethod(Initiator._QQSettingSettingActivity(), "doOnCreate", Bundle.class, mAddModuleEntry);
+        Class<?> kQQSettingSettingFragment = Initiator._QQSettingSettingFragment();
+        if (kQQSettingSettingFragment != null) {
+            Method doOnCreateView = kQQSettingSettingFragment.getDeclaredMethod("doOnCreateView",
+                    LayoutInflater.class, ViewGroup.class, Bundle.class);
+            XposedBridge.hookMethod(doOnCreateView, mAddModuleEntry);
+        }
         return true;
     }
 
@@ -96,7 +106,13 @@ public class SettingMcEntryHook extends BasePersistBackgroundHook {
         @Override
         protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
             try {
-                final Activity activity = (Activity) param.thisObject;
+                final Activity activity;
+                var thisObject = param.thisObject;
+                if (thisObject instanceof Activity) {
+                    activity = (Activity) thisObject;
+                } else {
+                    activity = (Activity) Reflex.invokeVirtual(thisObject, "getActivity");
+                }
                 Resources res = activity.getResources();
                 Class<?> itemClass;
                 View itemRef = null;
@@ -104,10 +120,10 @@ public class SettingMcEntryHook extends BasePersistBackgroundHook {
                     Class<?> clz = load("com/tencent/mobileqq/widget/FormSimpleItem");
                     if (clz != null) {
                         // find a candidate view field
-                        for (Field f : activity.getClass().getDeclaredFields()) {
+                        for (Field f : thisObject.getClass().getDeclaredFields()) {
                             if (f.getType() == clz && !Modifier.isStatic(f.getModifiers())) {
                                 f.setAccessible(true);
-                                View v = (View) f.get(activity);
+                                View v = (View) f.get(thisObject);
                                 if (v != null && v.getParent() != null) {
                                     itemRef = v;
                                     break;
@@ -137,7 +153,9 @@ public class SettingMcEntryHook extends BasePersistBackgroundHook {
                 item.setId(R.id.setting2Activity_settingEntryItem);
                 Reflex.invokeVirtual(item, "setLeftText", "McHookTool", CharSequence.class);
                 Reflex.invokeVirtual(item, "setBgType", 2, int.class);
-                if (LicenseStatus.hasUserAcceptEula()) {
+                if (HookInstaller.getFuncInitException() != null) {
+                    Reflex.invokeVirtual(item, "setRightText", "[严重错误]", CharSequence.class);
+                } else if (LicenseStatus.hasUserAcceptEula()) {
                     Reflex.invokeVirtual(item, "setRightText", "hook数据小工具", CharSequence.class);
                 } else {
                     Reflex.invokeVirtual(item, "setRightText", "[未激活]", CharSequence.class);
