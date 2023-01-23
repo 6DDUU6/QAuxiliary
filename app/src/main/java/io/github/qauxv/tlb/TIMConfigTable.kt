@@ -21,6 +21,7 @@
  */
 package io.github.qauxv.tlb
 
+import cc.ioctl.hook.entertainment.AutoMosaicName
 import cc.ioctl.hook.ui.chat.ReplyNoAtHook
 import io.github.qauxv.bridge.QQMessageFacade
 import io.github.qauxv.util.TIMVersion.TIM_1_0_0
@@ -28,7 +29,7 @@ import io.github.qauxv.util.TIMVersion.TIM_3_0_0
 import io.github.qauxv.util.TIMVersion.TIM_3_1_1
 import io.github.qauxv.util.TIMVersion.TIM_3_3_0
 import io.github.qauxv.util.TIMVersion.TIM_3_3_1
-import cc.ioctl.hook.entertainment.AutoMosaicName
+import io.github.qauxv.util.TIMVersion.TIM_3_5_0
 
 class TIMConfigTable : ConfigTableInterface {
 
@@ -43,17 +44,20 @@ class TIMConfigTable : ConfigTableInterface {
                     TIM_3_0_0 to "wa",
                     TIM_3_1_1 to "PK",
                     TIM_3_3_0 to "PO",
+                    TIM_3_5_0 to "PB",
             ),
 
             ReplyNoAtHook::class.java.simpleName to mapOf(
                     TIM_3_1_1 to "wg",
                     TIM_3_3_0 to "wk",
+                    TIM_3_3_1 to "wf",
             ),
 
             AutoMosaicName::class.java.simpleName to mapOf(
                     TIM_3_0_0 to "jU",
                     TIM_3_1_1 to "wm",
-                    TIM_3_3_1 to "wq",
+                    TIM_3_3_0 to "wq",
+                    TIM_3_5_0 to "wl",
             ),
     )
 

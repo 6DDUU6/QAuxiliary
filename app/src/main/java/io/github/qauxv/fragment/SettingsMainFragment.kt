@@ -41,6 +41,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import cc.ioctl.dialog.WsaWarningDialog
 import cc.ioctl.util.LayoutHelper.MATCH_PARENT
 import cc.ioctl.util.ui.drawable.BackgroundDrawableUtils
 import io.github.qauxv.R
@@ -64,13 +65,12 @@ import io.github.qauxv.util.SyncUtils
 import io.github.qauxv.util.SyncUtils.async
 import io.github.qauxv.util.SyncUtils.runOnUiThread
 import io.github.qauxv.util.UiThread
+import io.github.qauxv.util.isInHostProcess
 import kotlinx.coroutines.flow.MutableStateFlow
 import me.singleneuron.util.forSuBanXia
 
 class SettingsMainFragment : BaseRootLayoutFragment() {
 
-    override fun getTitle() = title
-    private var title: String = "QAuxiliary"
     private lateinit var mFragmentLocations: Array<String>
     private lateinit var mFragmentDescription: FragmentDescription
     private var mTargetUiAgentNavId: String? = null
@@ -105,7 +105,7 @@ class SettingsMainFragment : BaseRootLayoutFragment() {
             throw IllegalArgumentException("fragment description is not FragmentDescription, got: " + desc.javaClass.name)
         }
         mFragmentDescription = desc
-        title = mFragmentDescription.name ?: title
+        title = mFragmentDescription.name ?: "QAuxiliary"
         mTargetUiAgentNavId = arguments?.getString(TARGET_UI_AGENT_IDENTIFIER)
     }
 
@@ -184,6 +184,9 @@ class SettingsMainFragment : BaseRootLayoutFragment() {
         }
         rootLayoutView = recyclerListView
         rootView.addView(recyclerListView!!, FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT))
+        if (isInHostProcess) {
+            WsaWarningDialog.showWsaWarningDialogIfNecessary(requireContext())
+        }
         return rootView
     }
 

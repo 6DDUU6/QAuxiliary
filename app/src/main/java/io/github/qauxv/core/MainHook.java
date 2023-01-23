@@ -28,6 +28,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import cc.ioctl.hook.PacketHook;
 import cc.ioctl.hook.SettingMcEntryHook;
+import android.system.Os;
+import android.system.StructUtsname;
 import cc.ioctl.hook.experimental.FileRecvRedirect;
 import cc.ioctl.hook.experimental.ForcePadMode;
 import cc.ioctl.hook.chat.GagInfoDisclosure;
@@ -97,6 +99,10 @@ public class MainHook {
         injectLifecycleForProcess(ctx);
         if (HostInfo.isQQHD()) {
             initForQQHDBasePadActivityMitigation();
+        }
+        if (isWindowsSubsystemForAndroid()) {
+            Log.w("WSA detected, aggressive resource injection is required to prevent ResourceNotFound crash.");
+            // TODO: 2023-1-20 implement aggressive resource injection
         }
         boolean safeMode = ConfigManager.getDefaultConfig().getBooleanOrDefault(KEY_SAFE_MODE, false);
         if (safeMode) {
@@ -220,5 +226,11 @@ public class MainHook {
                 Log.e("initForQQHDBasePadActivityMitigation: startActivityForResult not found", e);
             }
         }
+    }
+
+    public static boolean isWindowsSubsystemForAndroid() {
+        StructUtsname uts = Os.uname();
+        // XXX: is this reliable?
+        return uts.release.contains("-windows-subsystem-for-android-");
     }
 }
