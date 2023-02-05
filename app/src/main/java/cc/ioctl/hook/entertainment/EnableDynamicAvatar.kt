@@ -30,7 +30,6 @@ import io.github.qauxv.hook.CommonSwitchFunctionHook
 import io.github.qauxv.util.QQVersion
 import io.github.qauxv.util.dexkit.DexKit
 import io.github.qauxv.util.dexkit.FriendProfileImageActivity_q3
-import io.github.qauxv.util.dexkit.PaiYiPaiHandler_canSendReq
 import io.github.qauxv.util.dexkit.ZPlanApiImpl_isZPlanAvatarSettingEnable
 import io.github.qauxv.util.requireMinQQVersion
 

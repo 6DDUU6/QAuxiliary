@@ -636,13 +636,13 @@ object PaiYiPaiHandler_canSendReq : DexKitTarget.UsingStr() {
     override val filter = DexKitFilter.allowAll
 }
 
-object ZPlanApiImpl_isZPlanAvatarSettingEnable : DexKitTarget.UsingStr() {
+object ZPlanApiImpl_isZPlanAvatarSettingEnable : DexKitTarget.UsingDexkit() {
     override val findMethod: Boolean = true
     override val declaringClass = "com/tencent/mobileqq/zplan/api/impl/ZPlanApiImpl"
     override val filter = DexKitFilter.allowAll
 }
 
-object FriendProfileImageActivity_q3 : DexKitTarget.UsingStr() {
+object FriendProfileImageActivity_q3 : DexKitTarget.UsingDexkit() {
     override val findMethod: Boolean = true
     override val declaringClass = "com/tencent/mobileqq/activity/FriendProfileImageActivity"
     override val filter = DexKitFilter.allowAll
