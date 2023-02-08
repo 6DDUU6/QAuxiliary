@@ -21,25 +21,19 @@
  */
 package cc.ioctl.hook.entertainment;
 
-import android.app.Activity;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import cc.ioctl.util.HookUtils;
 import cc.ioctl.util.HostInfo;
-import cc.ioctl.util.Reflex;
 import io.github.qauxv.base.annotation.FunctionHookEntry;
 import io.github.qauxv.base.annotation.UiItemAgentEntry;
 import io.github.qauxv.dsl.FunctionEntryRouter;
-import io.github.qauxv.dsl.FunctionEntryRouter.Locations.Simplify;
 import io.github.qauxv.hook.CommonSwitchFunctionHook;
 import io.github.qauxv.util.Initiator;
 import io.github.qauxv.util.QQVersion;
 import io.github.qauxv.util.SyncUtils;
-import io.github.qauxv.util.dexkit.CTroopGiftUtil;
-import io.github.qauxv.util.dexkit.DexKit;
 import io.github.qauxv.util.dexkit.DexKitTarget;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.Objects;
 
 @FunctionHookEntry
@@ -55,13 +49,13 @@ public class EnableDynamicAvatar extends CommonSwitchFunctionHook {
     @Nullable
     @Override
     public String getDescription() {
-        return "查看有动态头像的QQ资料卡时会显示";
+        return "查看有动态头像的QQ资料卡时会显示,仅支持8.9.28";
     }
 
     @NonNull
     @Override
     public String[] getUiItemLocation() {
-        return FunctionEntryRouter.Locations.Entertainment.ENTERTAIN_CATEGORY;
+        return FunctionEntryRouter.Locations.Auxiliary.EXPERIMENTAL_CATEGORY;
     }
 
     public static final EnableDynamicAvatar INSTANCE = new EnableDynamicAvatar();
