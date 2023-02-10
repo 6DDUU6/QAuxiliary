@@ -25,6 +25,7 @@ package cc.ioctl.hook;
 import static de.robv.android.xposed.XposedBridge.log;
 import static io.github.qauxv.util.Initiator.load;
 
+import android.content.Context;
 import cc.ioctl.util.HttpUtil;
 import com.google.gson.Gson;
 import com.qq.taf.jce.HexUtil;
@@ -543,7 +544,7 @@ public class PacketHook {
         HttpUtil.post(url, buffer);
     }
 
-    public void checkAndInit() {
+    public void checkAndInit(Context ctx) {
         if (McHookStatus.getOpenStatus() == 1) {
             initOnce();
         }
@@ -556,6 +557,7 @@ public class PacketHook {
         if (McHookStatus.getGuidStatus() == 1) {
             initRandomGuid();
         }
+        saveGuid(ctx);
     }
 
     public boolean initOnce() {
@@ -641,6 +643,22 @@ public class PacketHook {
                 log("McHookTool: tools.util isnull");
             }
             hookGuidReturn(clz);
+            return true;
+        } catch (Throwable e) {
+            log(e);
+            return false;
+        }
+    }
+
+    public boolean saveGuid(Context ctx) {
+        try {
+            log("开始getGuid");
+            Class clz = load("oicq.wlogin_sdk.tools.util");
+            if (clz == null) {
+                log("McHookTool: tools.util isnull");
+            }
+            byte[] guid = (byte[]) XposedHelpers.callStaticMethod(clz, "get_last_guid", ctx);
+            McHookStatus.setGuidValue(HexUtil.bytes2HexStr(guid));
             return true;
         } catch (Throwable e) {
             log(e);

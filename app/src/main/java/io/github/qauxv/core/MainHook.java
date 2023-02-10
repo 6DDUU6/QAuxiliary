@@ -158,7 +158,7 @@ public class MainHook {
                 InjectDelayableHooks.step(dir);
             }
         }
-        PacketHook.INSTANCE.checkAndInit();
+        PacketHook.INSTANCE.checkAndInit(ctx);
     }
 
     private static boolean isForegroundStartupForMainProcess(Context ctx, Object step) {

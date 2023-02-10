@@ -35,6 +35,7 @@ public class McHookStatus {
     public static final String mc_tool_open_md5 = "mc_tool_open_md5";
     public static final String mc_tool_open_guid = "mc_tool_open_guid";
     public static final String mc_tool_url = "mc_tool_url";
+    public static final String mc_guid_value = "mc_guid_value";
 
     public static int getOpenStatus() {
         return ConfigManager.getDefaultConfig().getIntOrDefault(mc_tool_open, 0);
@@ -98,6 +99,19 @@ public class McHookStatus {
 
     public static void setServerUrl(String url) {
         ConfigManager.getDefaultConfig().putString(mc_tool_url, url);
+        try {
+            ConfigManager.getDefaultConfig().save();
+        } catch (Exception e) {
+            log(e);
+            Toasts.error(HostInfo.getHostInfo().getApplication(), e.toString());
+        }
+    }
+    public static String getGuidValue(String defaultValue) {
+        return ConfigManager.getDefaultConfig().getStringOrDefault(mc_guid_value, defaultValue);
+    }
+
+    public static void setGuidValue(String guid) {
+        ConfigManager.getDefaultConfig().putString(mc_guid_value, guid);
         try {
             ConfigManager.getDefaultConfig().save();
         } catch (Exception e) {

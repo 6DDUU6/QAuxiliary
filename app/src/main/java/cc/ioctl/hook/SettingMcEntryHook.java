@@ -243,8 +243,13 @@ public class SettingMcEntryHook extends BasePersistBackgroundHook {
         editText.setTextSize(16f);
         int _5 = LayoutHelper.dip2px(activity, 5f);
         editText.setPadding(_5, _5, _5, _5 * 2);
-        String address = McHookStatus.getServerUrl("http://192.168.8.58/hook");
+        String address = McHookStatus.getServerUrl("http://192.168.10:103:8888");
         editText.setText(address);
+        EditText editTextGuid = new EditText(ctx);
+        editTextGuid.setTextSize(16f);
+        editTextGuid.setPadding(_5, _5, _5, _5 * 2);
+        String guid = McHookStatus.getGuidValue("什么都没获取到");
+        editTextGuid.setText(guid);
         CheckBox checkBox = new CheckBox(ctx);
         checkBox.setText("开启数据发送");
         checkBox.setChecked(McHookStatus.getOpenStatus() == 1);
@@ -327,6 +332,14 @@ public class SettingMcEntryHook extends BasePersistBackgroundHook {
         );
         linearLayout.addView(
                 checkBoxGuid,
+                LayoutHelper.newLinearLayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        _5 * 2
+                )
+        );
+        linearLayout.addView(
+                editTextGuid,
                 LayoutHelper.newLinearLayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT,
