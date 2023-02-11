@@ -1,6 +1,6 @@
 /*
  * QAuxiliary - An Xposed module for QQ/TIM
- * Copyright (C) 2019-2022 qwq233@qwq2333.top
+ * Copyright (C) 2019-2023 QAuxiliary developers
  * https://github.com/cinit/QAuxiliary
  *
  * This software is non-free but opensource software: you can redistribute it
@@ -19,7 +19,9 @@
  * <https://www.gnu.org/licenses/>
  * <https://github.com/cinit/QAuxiliary/blob/master/LICENSE.md>.
  */
-package cc.ioctl.hook.entertainment;
+package cc.ioctl.hook.experimental;
+
+import static io.github.qauxv.util.HostInfo.requireMinQQVersion;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -58,6 +60,11 @@ public class EnableDynamicAvatar extends CommonSwitchFunctionHook {
         return FunctionEntryRouter.Locations.Auxiliary.EXPERIMENTAL_CATEGORY;
     }
 
+    @Override
+    public boolean isAvailable() {
+        return requireMinQQVersion(QQVersion.QQ_8_9_28);
+    }
+
     public static final EnableDynamicAvatar INSTANCE = new EnableDynamicAvatar();
 
     private EnableDynamicAvatar() {
@@ -68,21 +75,17 @@ public class EnableDynamicAvatar extends CommonSwitchFunctionHook {
     public boolean initOnce() throws Exception {
         {
             Class<?> ZPlanApiImpl = Initiator.load("com/tencent/mobileqq/zplan/api/impl/ZPlanApiImpl");
-            if (HostInfo.requireMinQQVersion(QQVersion.QQ_8_9_28)) {
-                Objects.requireNonNull(ZPlanApiImpl, "ZPlanApiImplCallback");
-            }
+            Objects.requireNonNull(ZPlanApiImpl, "ZPlanApiImpl is null");
             if (ZPlanApiImpl != null) {
                 Method method = ZPlanApiImpl.getDeclaredMethod("isZPlanAvatarSettingEnable");
                 Objects.requireNonNull(method, "isZPlanAvatarSettingEnable method is null");
                 HookUtils.hookBeforeIfEnabled(this, method, 47, param -> param.setResult(true));
             }
-            Class<?> FriendProfileImageActivity = Initiator.load("com/tencent/mobileqq/activity/FriendProfileImageActivity");
-            if (HostInfo.requireMinQQVersion(QQVersion.QQ_8_9_28)) {
-                Objects.requireNonNull(FriendProfileImageActivity, "q3Callback");
-            }
-            if (FriendProfileImageActivity != null) {
-                Method methodq = FriendProfileImageActivity.getDeclaredMethod("q3");
-                Objects.requireNonNull(methodq, "q3 method is null");
+            Class<?> WinkEditorResourceAPIImpl = Initiator.load("com/tencent/mobileqq/wink/api/impl/WinkEditorResourceAPIImpl");
+            Objects.requireNonNull(WinkEditorResourceAPIImpl, "WinkEditorResourceAPIImpl is null");
+            if (WinkEditorResourceAPIImpl != null) {
+                Method methodq = WinkEditorResourceAPIImpl.getDeclaredMethod("queryAB");
+                Objects.requireNonNull(methodq, "queryAB method is null");
                 HookUtils.hookBeforeIfEnabled(this, methodq, 47, param -> param.setResult(true));
             }
         }
