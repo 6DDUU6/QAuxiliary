@@ -34,6 +34,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Icon;
+import android.os.Build;
 import android.view.View;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -764,7 +765,8 @@ public class ExfriendManager {
                 Intent wrapper = new Intent();
                 wrapper.setClassName(HostInfo.getApplication().getPackageName(), ActProxyMgr.STUB_DEFAULT_ACTIVITY);
                 wrapper.putExtra(ActProxyMgr.ACTIVITY_PROXY_INTENT, inner);
-                PendingIntent pi = PendingIntent.getActivity(HostInfo.getApplication(), 0, wrapper, PendingIntent.FLAG_IMMUTABLE);
+                PendingIntent pi = PendingIntent.getActivity(HostInfo.getApplication(), 0, wrapper,
+                        Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_IMMUTABLE : 0);
                 NotificationManager nm = (NotificationManager) app.getSystemService(Context.NOTIFICATION_SERVICE);
                 Notification n = createNotiComp(nm, (String) ptr[1], (String) ptr[2], (String) ptr[3],
                         new long[]{100, 200, 200, 100}, pi);
@@ -801,9 +803,15 @@ public class ExfriendManager {
         } else {
             builder = new Notification.Builder(app);
         }
-        Parasitics.injectModuleResources(app.getResources());
-        // We have to createWithBitmap rather than with a ResId, otherwise RemoteServiceException
-        builder.setSmallIcon(Icon.createWithBitmap(BitmapFactory.decodeResource(app.getResources(), R.drawable.ic_del_friend_top)));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Parasitics.injectModuleResources(app.getResources());
+            // We have to createWithBitmap rather than with a ResId, otherwise RemoteServiceException
+            builder.setSmallIcon(Icon.createWithBitmap(
+                BitmapFactory.decodeResource(app.getResources(), R.drawable.ic_del_friend_top)));
+        } else {
+            // 2023 now, still using SDK < 23?
+            builder.setSmallIcon(android.R.drawable.ic_delete);
+        }
         builder.setTicker(ticker);
         builder.setContentTitle(title);
         builder.setContentText(content);

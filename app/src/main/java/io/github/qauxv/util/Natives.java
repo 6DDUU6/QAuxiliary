@@ -250,7 +250,9 @@ public class Natives {
                     Log.e("Build.SUPPORTED_32_BIT_ABIS is: " + Arrays.toString(Build.SUPPORTED_32_BIT_ABIS));
                     Log.e("Build.SUPPORTED_64_BIT_ABIS is: " + Arrays.toString(Build.SUPPORTED_64_BIT_ABIS));
                     // check whether this is a 64-bit ART runtime
-                    Log.e("Process.is64bit is: " + Process.is64Bit());
+                    if (VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        Log.e("Process.is64bit is: " + Process.is64Bit());
+                    }
                     StructUtsname uts = Os.uname();
                     Log.e("uts.machine is: " + uts.machine);
                     Log.e("uts.version is: " + uts.version);
@@ -338,8 +340,29 @@ public class Natives {
         return soFile;
     }
 
+    @SuppressWarnings("deprecation")
+    public static boolean is64Bit() {
+        if (VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return Process.is64Bit();
+        } else {
+            // It's possible to have a 64-bit ART on Android 5.0 or 5.1
+            try {
+                Class<?> kVMRuntime = Class.forName("dalvik.system.VMRuntime");
+                Method getRuntime = kVMRuntime.getDeclaredMethod("getRuntime");
+                Method method = kVMRuntime.getDeclaredMethod("is64Bit");
+                Object runtime = getRuntime.invoke(null);
+                return (Boolean) method.invoke(runtime);
+            } catch (ReflectiveOperationException e) {
+                android.util.Log.e("QAuxv", "Failed to detect 64-bit ART", e);
+                String abi1 = Build.CPU_ABI;
+                String abi2 = Build.CPU_ABI2;
+                return (abi1 != null && abi1.contains("64")) || (abi2 != null && abi2.contains("64"));
+            }
+        }
+    }
+
     public static String getAbiForLibrary() {
-        String[] supported = Process.is64Bit() ? Build.SUPPORTED_64_BIT_ABIS : Build.SUPPORTED_32_BIT_ABIS;
+        String[] supported = is64Bit() ? Build.SUPPORTED_64_BIT_ABIS : Build.SUPPORTED_32_BIT_ABIS;
         if (supported == null || supported.length == 0) {
             throw new IllegalStateException("No supported ABI in this device");
         }

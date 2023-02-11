@@ -23,6 +23,7 @@ package io.github.qauxv.startup;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Build;
 import android.util.Log;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
@@ -99,7 +100,9 @@ public class StartupHook {
 
     static void deleteDirIfNecessaryNoThrow(Context ctx) {
         try {
-            deleteFile(new File(ctx.getDataDir(), "app_qqprotect"));
+            if (Build.VERSION.SDK_INT >= 24) {
+                deleteFile(new File(ctx.getDataDir(), "app_qqprotect"));
+            }
             if (new File(ctx.getFilesDir(), "qn_disable_hot_patch").exists()) {
                 deleteFile(ctx.getFileStreamPath("hotpatch"));
             }
