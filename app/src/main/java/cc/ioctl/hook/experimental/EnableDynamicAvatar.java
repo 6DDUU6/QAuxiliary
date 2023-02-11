@@ -84,7 +84,7 @@ public class EnableDynamicAvatar extends CommonSwitchFunctionHook {
             Class<?> WinkEditorResourceAPIImpl = Initiator.load("com/tencent/mobileqq/wink/api/impl/WinkEditorResourceAPIImpl");
             Objects.requireNonNull(WinkEditorResourceAPIImpl, "WinkEditorResourceAPIImpl is null");
             if (WinkEditorResourceAPIImpl != null) {
-                Method methodq = WinkEditorResourceAPIImpl.getDeclaredMethod("queryAB");
+                Method methodq = WinkEditorResourceAPIImpl.getDeclaredMethod("queryAB", String.class, String.class, boolean.class);
                 Objects.requireNonNull(methodq, "queryAB method is null");
                 HookUtils.hookBeforeIfEnabled(this, methodq, 47, param -> param.setResult(true));
             }
