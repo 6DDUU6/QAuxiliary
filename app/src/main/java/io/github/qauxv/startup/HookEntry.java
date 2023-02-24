@@ -29,10 +29,9 @@ import io.github.qauxv.R;
 import io.github.qauxv.util.hookstatus.HookStatusInit;
 
 /**
- * Xposed entry class DO NOT MODIFY ANY CODE HERE UNLESS NECESSARY. DO NOT INVOKE ANY METHOD THAT MAY GET IN TOUCH WITH
- * KOTLIN HERE. DO NOT TOUCH ANDROIDX OR KOTLIN HERE, WHATEVER DIRECTLY OR INDIRECTLY. THIS CLASS SHOULD ONLY CALL
- * {@code StartupHook.getInstance().doInit()} AND RETURN GRACEFULLY. OTHERWISE SOMETHING MAY HAPPEN BECAUSE OF A
- * NON-STANDARD PLUGIN CLASSLOADER.
+ * Xposed entry class DO NOT MODIFY ANY CODE HERE UNLESS NECESSARY. DO NOT INVOKE ANY METHOD THAT MAY GET IN TOUCH WITH KOTLIN HERE. DO NOT TOUCH ANDROIDX OR
+ * KOTLIN HERE, WHATEVER DIRECTLY OR INDIRECTLY. THIS CLASS SHOULD ONLY CALL {@code StartupHook.getInstance().doInit()} AND RETURN GRACEFULLY. OTHERWISE
+ * SOMETHING MAY HAPPEN BECAUSE OF A NON-STANDARD PLUGIN CLASSLOADER.
  *
  * @author kinit
  */
@@ -49,6 +48,8 @@ public class HookEntry implements IXposedHookLoadPackage, IXposedHookZygoteInit 
     private static XC_LoadPackage.LoadPackageParam sLoadPackageParam = null;
     private static IXposedHookZygoteInit.StartupParam sInitZygoteStartupParam = null;
     private static String sModulePath = null;
+
+    public static String sCurrentPackageName = null;
 
     /**
      * *** No kotlin code should be invoked here.*** May cause a crash.
@@ -79,6 +80,7 @@ public class HookEntry implements IXposedHookLoadPackage, IXposedHookZygoteInit 
                 if (sInitZygoteStartupParam == null) {
                     throw new IllegalStateException("handleLoadPackage: sInitZygoteStartupParam is null");
                 }
+                sCurrentPackageName = lpparam.packageName;
                 StartupHook.getInstance().initialize(lpparam.classLoader);
                 break;
             }
