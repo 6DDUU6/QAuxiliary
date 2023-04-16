@@ -22,13 +22,13 @@
 
 package cc.ioctl.util;
 
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.AsyncHttpClient.BoundRequestBuilder;
+import com.ning.http.client.ListenableFuture;
+import com.ning.http.client.RequestBuilder;
+import com.ning.http.client.Response;
 import java.io.IOException;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+import java.util.concurrent.Executors;
 
 /**
  * @author weiguan
@@ -37,40 +37,32 @@ import okhttp3.Response;
  */
 public class HttpUtil {
     public static void post(String url, byte[] data) {
-        OkHttpClient okHttpClient = new OkHttpClient();
-        RequestBody body = RequestBody.create(data);
-        final Request request = new Request.Builder()
-                .url(url)
-                .post(body)
-                .build();
-        Call call = okHttpClient.newCall(request);
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        BoundRequestBuilder builder = client.preparePost(url);
+        builder.setBody(data);
+        ListenableFuture<Response> future = client.executeRequest(builder.build());
+        future.addListener(() -> {
+            try {
+                Response response = future.get();
+                // 处理响应结果
+            } catch (Exception e) {
+                // 处理异常情况
             }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-            }
-        });
+        }, Executors.newSingleThreadExecutor());
     }
 
     public static void get(String url, byte[] data) {
-        OkHttpClient okHttpClient = new OkHttpClient();
-        RequestBody body = RequestBody.create(data);
-        final Request request = new Request.Builder()
-                .url(url)
-                .get()
-                .build();
-        Call call = okHttpClient.newCall(request);
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        BoundRequestBuilder builder = client.prepareGet(url);
+        //builder.setBody(data);
+        ListenableFuture<Response> future = client.executeRequest(builder.build());
+        future.addListener(() -> {
+            try {
+                Response response = future.get();
+                // 处理响应结果
+            } catch (Exception e) {
+                // 处理异常情况
             }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-            }
-        });
+        }, Executors.newSingleThreadExecutor());
     }
 }

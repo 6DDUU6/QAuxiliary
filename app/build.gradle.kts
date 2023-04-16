@@ -215,7 +215,7 @@ dependencies {
     implementation(libs.ezXHelper)
     implementation(libs.conscrypt)
     implementation(libs.bouncycastle)
-    implementation(libs.okhttp)
+    implementation(libs.async.http)
     implementation(libs.gson)
     // festival title
     implementation(libs.confetti)
