@@ -31,7 +31,9 @@ xposed = { module = "de.robv.android.xposed:api", version = "82"}
 flexbox = { module = "com.google.android.flexbox:flexbox", version = "3.0.0"}
 colorpicker = { module = "com.jaredrummler:colorpicker", version = "1.1.0"}
 ezXHelper = { module = "com.github.kyuubiran:EzXHelper", version = "1.0.3"}
-okhttp = { module = "com.squareup.okhttp3:okhttp", version = "4.10.0"}
+okhttp = { module = "com.squareup.okhttp3:okhttp", version = "5.0.0-alpha.2"}
+conscrypt = { module = "org.conscrypt:conscrypt-openjdk-uber", version = "2.2.1"}
+bouncycastle = { module = "org.bouncycastle:bcprov-jdk15on", version = "1.55"}
 gson = { module = "com.google.code.gson:gson", version = "2.6.2"}
 confetti = { module = "com.github.jinatonic.confetti:confetti", version = "1.1.2"}
 weatherView = { module = "com.github.MatteoBattilana:WeatherView", version = "3.0.0"}
