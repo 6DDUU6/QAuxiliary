@@ -213,7 +213,9 @@ dependencies {
     implementation(libs.material.dialogs.core)
     implementation(libs.material.dialogs.input)
     implementation(libs.ezXHelper)
-    implementation(libs.okhttp)
+    implementation(libs.conscrypt)
+    implementation(libs.bouncycastle)
+    implementation(libs.async.http)
     implementation(libs.gson)
     // festival title
     implementation(libs.confetti)

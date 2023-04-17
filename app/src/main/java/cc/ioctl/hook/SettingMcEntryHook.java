@@ -44,6 +44,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 
 import androidx.appcompat.app.AlertDialog;
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.AsyncHttpClient.BoundRequestBuilder;
+import com.ning.http.client.ListenableFuture;
+import com.ning.http.client.Response;
 import io.github.qauxv.core.HookInstaller;
 import io.github.qauxv.fragment.FuncStatusDetailsFragment;
 import io.github.qauxv.util.Initiator;
@@ -71,11 +75,7 @@ import io.github.qauxv.ui.ResUtils;
 import io.github.qauxv.util.LicenseStatus;
 import io.github.qauxv.util.Log;
 import io.github.qauxv.util.McHookStatus;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
+import java.util.concurrent.Executors;
 
 @FunctionHookEntry
 public class SettingMcEntryHook extends BasePersistBackgroundHook {
@@ -381,24 +381,20 @@ public class SettingMcEntryHook extends BasePersistBackgroundHook {
             return;
         }
         String url = String.format(address + "/send?seq=%s&command=%s&uin=%s", "123", "test", "321");
-        OkHttpClient okHttpClient = new OkHttpClient();
-        RequestBody body = RequestBody.create(new byte[0]);
-        final Request request = new Request.Builder()
-                .url(url)
-                .post(body)
-                .build();
-        Call call = okHttpClient.newCall(request);
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        BoundRequestBuilder builder = client.preparePost(url);
+        builder.setBody(new byte[0]);
+        ListenableFuture<Response> future = client.executeRequest(builder.build());
+        future.addListener(() -> {
+            try {
+                Response response = future.get();
+                toast(activity, "连接成功");
+                // 处理响应结果
+            } catch (Exception e) {
+                // 处理异常情况
                 toast(activity, "连接失败!" + e.getMessage());
             }
-
-            @Override
-            public void onResponse(Call call, okhttp3.Response response) throws IOException {
-                toast(activity, "连接成功");
-            }
-        });
+        }, Executors.newSingleThreadExecutor());
     }
 
     public void toast(Context ctx, String text) {
