@@ -30,6 +30,7 @@ import cc.ioctl.hook.PacketHook;
 import cc.ioctl.hook.SettingMcEntryHook;
 import android.system.Os;
 import android.system.StructUtsname;
+import androidx.annotation.Nullable;
 import cc.ioctl.hook.SettingEntryHook;
 import cc.ioctl.hook.bak.MuteAtAllAndRedPacket;
 import cc.ioctl.hook.chat.GagInfoDisclosure;
@@ -126,30 +127,35 @@ public class MainHook {
                 // since we are in background, we can do some heavy work without compromising user experience
                 InjectDelayableHooks.stepForMainBackgroundStartup();
             }
-            Class<?> loadData = Initiator.requireClass("com/tencent/mobileqq/startup/step/LoadData");
-            Method doStep = null;
-            for (Method method : loadData.getDeclaredMethods()) {
-                if (method.getReturnType().equals(boolean.class) && method.getParameterTypes().length == 0) {
-                    doStep = method;
-                    break;
+            Class<?> loadData = Initiator.load("com/tencent/mobileqq/startup/step/LoadData");
+            if (loadData != null) {
+                Method doStep = null;
+                for (Method method : loadData.getDeclaredMethods()) {
+                    if (method.getReturnType().equals(boolean.class) && method.getParameterTypes().length == 0) {
+                        doStep = method;
+                        break;
+                    }
                 }
+                XposedBridge.hookMethod(doStep, new XC_MethodHook(51) {
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param) {
+                        if (third_stage_inited) {
+                            return;
+                        }
+                        Object dir = getStartDirector(param.thisObject);
+                        if (safeMode) {
+                            SettingEntryHook.INSTANCE.initialize();
+                            SettingMcEntryHook.INSTANCE.initialize();
+                        } else {
+                            InjectDelayableHooks.step(dir);
+                        }
+                        third_stage_inited = true;
+                    }
+                });
+            } else {
+                Log.w("LoadData not found, running third stage hooks in background");
+                InjectDelayableHooks.step(null);
             }
-            XposedBridge.hookMethod(doStep, new XC_MethodHook(51) {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) {
-                    if (third_stage_inited) {
-                        return;
-                    }
-                    Object dir = getStartDirector(param.thisObject);
-                    if (safeMode) {
-                        SettingEntryHook.INSTANCE.initialize();
-                        SettingMcEntryHook.INSTANCE.initialize();
-                    } else {
-                        InjectDelayableHooks.step(dir);
-                    }
-                    third_stage_inited = true;
-                }
-            });
         } else {
             if (!safeMode && LicenseStatus.hasUserAcceptEula()) {
                 Object dir = getStartDirector(step);
@@ -165,6 +171,7 @@ public class MainHook {
         return false;
     }
 
+    @Nullable
     private static Object getStartDirector(Object step) {
         Class<?> director = Initiator._StartupDirector();
         Object dir = Reflex.getInstanceObjectOrNull(step, "mDirector", director);
