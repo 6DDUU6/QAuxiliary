@@ -35,7 +35,7 @@ import io.github.qauxv.util.requireMinQQVersion
 
 @FunctionHookEntry
 @UiItemAgentEntry
-object DisableGrayUinCheck : CommonSwitchFunctionHook(arrayOf(GrayCheckHandler_Check)) {
+object DisableGrayUinCheck : CommonSwitchFunctionHook(targets = arrayOf(GrayCheckHandler_Check), defaultEnabled = true) {
 
     override val name = "屏蔽内测提示"
 
