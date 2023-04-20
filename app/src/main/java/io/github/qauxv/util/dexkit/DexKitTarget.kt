@@ -636,6 +636,13 @@ object PaiYiPaiHandler_canSendReq : DexKitTarget.UsingStr() {
     override val filter = DexKitFilter.allowAll
 }
 
+object GrayCheckHandler_Check : DexKitTarget.UsingStr() {
+    override val findMethod: Boolean = true
+    override val declaringClass = "com/tencent/mobileqq/graycheck/business/GrayCheckHandler"
+    override val traitString = arrayOf("GrayUinCheckResp is null")
+    override val filter = DexKitFilter.allowAll
+}
+
 object TroopGuildChatPie_flingRToL : DexKitTarget.UsingStr() {
     override val findMethod: Boolean = true
     override val declaringClass = "com.tencent.mobileqq.troop.guild.TroopGuildChatPie"
