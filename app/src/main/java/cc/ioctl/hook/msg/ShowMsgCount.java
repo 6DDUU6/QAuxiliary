@@ -99,19 +99,6 @@ public class ShowMsgCount extends CommonSwitchFunctionHook {
                 }
             }
         });
-        if (HostInfo.requireMinQQVersion(QQVersion.QQ_8_9_58)) {
-            Class<?> QBadgeView = Initiator.load("com/tencent/qqnt/widget/badgeview/QBadgeView");
-            if (QBadgeView != null) {
-                Method method = QBadgeView.getDeclaredMethod("t");
-                HookUtils.hookAfterIfEnabled(this, method, 47, param -> {
-                    Object result = param.getResult();
-                    Field f = result.getClass().getDeclaredField("B");
-                    f.setAccessible(true);
-                    f.set(result, String.valueOf(param.args[0]));
-                    param.setResult(result);
-                });
-            }
-        }
 
         return true;
     }
