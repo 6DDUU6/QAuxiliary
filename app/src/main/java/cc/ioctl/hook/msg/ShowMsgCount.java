@@ -24,6 +24,7 @@ package cc.ioctl.hook.msg;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import cc.ioctl.util.HookUtils;
 import cc.ioctl.util.HostInfo;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
@@ -31,11 +32,13 @@ import io.github.qauxv.base.annotation.FunctionHookEntry;
 import io.github.qauxv.base.annotation.UiItemAgentEntry;
 import io.github.qauxv.dsl.FunctionEntryRouter.Locations.Auxiliary;
 import io.github.qauxv.hook.CommonSwitchFunctionHook;
+import io.github.qauxv.util.Initiator;
 import io.github.qauxv.util.LicenseStatus;
 import io.github.qauxv.util.QQVersion;
 import io.github.qauxv.util.dexkit.DexKit;
 import io.github.qauxv.util.dexkit.DexKitTarget;
 import io.github.qauxv.util.dexkit.NCustomWidgetUtil_updateCustomNoteTxt;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 /**
@@ -66,7 +69,7 @@ public class ShowMsgCount extends CommonSwitchFunctionHook {
     }
 
     @Override
-    public boolean initOnce() {
+    public boolean initOnce() throws NoSuchMethodException {
         Method updateCustomNoteTxt = DexKit.loadMethodFromCache(NCustomWidgetUtil_updateCustomNoteTxt.INSTANCE);
         XposedBridge.hookMethod(updateCustomNoteTxt, new XC_MethodHook() {
             @Override
@@ -96,6 +99,20 @@ public class ShowMsgCount extends CommonSwitchFunctionHook {
                 }
             }
         });
+        if (HostInfo.requireMinQQVersion(QQVersion.QQ_8_9_58)) {
+            Class<?> QBadgeView = Initiator.load("com/tencent/qqnt/widget/badgeview/QBadgeView");
+            if (QBadgeView != null) {
+                Method method = QBadgeView.getDeclaredMethod("t");
+                HookUtils.hookAfterIfEnabled(this, method, 47, param -> {
+                    Object result = param.getResult();
+                    Field f = result.getClass().getDeclaredField("B");
+                    f.setAccessible(true);
+                    f.set(result, String.valueOf(param.args[0]));
+                    param.setResult(result);
+                });
+            }
+        }
+
         return true;
     }
 }
