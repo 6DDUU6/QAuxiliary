@@ -22,7 +22,7 @@
 
 package xyz.nextalone.data
 
-import com.hicore.ReflectUtil.MMethod
+import cc.hicore.ReflectUtil.MMethod
 import io.github.qauxv.bridge.ManagerHelper
 import io.github.qauxv.util.Initiator._TroopInfo
 import xyz.nextalone.util.get

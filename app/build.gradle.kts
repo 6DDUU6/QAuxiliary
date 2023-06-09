@@ -40,8 +40,8 @@ plugins {
     id("build-logic.android.application")
     alias(libs.plugins.changelog)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.license)
     alias(libs.plugins.serialization)
+    alias(libs.plugins.aboutlibraries)
 }
 
 val currentBuildUuid = UUID.randomUUID().toString()
@@ -84,7 +84,7 @@ android {
                     "-Wno-unused-command-line-argument",
                     "-DMMKV_DISABLE_CRYPT",
                 )
-                cppFlags("-std=c++17", *flags)
+                cppFlags("-std=c++20", *flags)
                 cFlags("-std=c18", *flags)
                 targets += "qauxv"
             }
@@ -173,7 +173,6 @@ android {
         val variantCapped = name.capitalizeUS()
         val mergeAssets = tasks.getByName("merge${variantCapped}Assets")
         mergeAssets.dependsOn(generateEulaAndPrivacy)
-        mergeAssets.dependsOn("data${variantCapped}Descriptor")
     }
 }
 
@@ -183,20 +182,11 @@ kotlin {
     }
 }
 
-licenseReport {
-    generateCsvReport = false
-    generateHtmlReport = false
-    generateJsonReport = true
-    generateTextReport = false
-
-    copyCsvReportToAssets = false
-    copyHtmlReportToAssets = false
-}
-
 dependencies {
     compileOnly(projects.libs.stub)
     implementation(projects.libs.mmkv)
     implementation(projects.libs.dexkit)
+    implementation(projects.libs.xView)
     ksp(projects.libs.ksp)
     compileOnly(libs.xposed)
     implementation(libs.androidx.core.ktx)
@@ -222,6 +212,7 @@ dependencies {
     implementation(libs.appcenter.crashes)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.sealedEnum.runtime)
+    implementation(libs.glide)
     ksp(libs.sealedEnum.ksp)
 }
 
@@ -251,19 +242,6 @@ androidComponents.onVariants { variant ->
         group = "qauxv"
         dependsOn(":app:install$variantCapped")
         finalizedBy(restartQQ)
-    }
-    task("data${variantCapped}Descriptor") {
-        inputs.file("${buildDir}/reports/licenses/license${variantCapped}Report.json")
-        outputs.file("${projectDir}/src/main/assets/open_source_licenses.json")
-        dependsOn("license${variantCapped}Report")
-
-        doFirst {
-            val input = inputs.files.singleFile
-            val output = outputs.files.singleFile
-            this.runCatching {
-                output.writeText(Licenses.transform(input.readText()))
-            }
-        }
     }
 }
 
