@@ -34,6 +34,7 @@ import android.os.Parcelable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -42,6 +43,7 @@ import cc.hicore.ReflectUtil.MMethod;
 import cc.hicore.dialog.RepeaterPlusIconSettingDialog;
 import cc.ioctl.util.HookUtils;
 import cc.ioctl.util.HostInfo;
+import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import io.github.qauxv.base.ISwitchCellAgent;
@@ -153,6 +155,60 @@ public class RepeaterPlus extends BaseFunctionHook {
     @Override
     @SuppressLint({"WrongConstant", "ResourceType"})
     public boolean initOnce() throws Exception {
+        if (HostInfo.requireMinQQVersion(QQVersion.QQ_8_9_63)) {
+            // temporary
+            XC_MethodHook callback = new XC_MethodHook() {
+                private ImageView img;
+                private volatile long click_time = 0;
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    ImageView imageView;
+                    if (param.args.length == 0) {
+                        Object result = param.getResult();
+                        if (result instanceof ImageView) {
+                            this.img = (ImageView) result;
+                            this.img.setImageBitmap(RepeaterPlusIconSettingDialog.getRepeaterIcon());
+                        }
+                    } else if (param.args.length == 3 && (imageView = this.img) != null) {
+                        if (img.getContext().getClass().getName().contains("MultiForwardActivity")) {
+                            return;
+                        }
+                        if (RepeaterPlusIconSettingDialog.getIsDoubleClick()) {
+                            img.setOnClickListener(v -> {
+                                try {
+                                    if (System.currentTimeMillis() - 200 > click_time) {
+                                        return;
+                                    }
+                                } finally {
+                                    click_time = System.currentTimeMillis();
+                                }
+                                try {
+                                    Object a = Initiator.loadClass("com.tencent.mobileqq.aio.msglist.holder.component.msgfollow.a")
+                                            .getDeclaredConstructor(param.thisObject.getClass()).newInstance(param.thisObject);
+                                    a.getClass().getMethod("onClick", View.class).invoke(a, v);
+                                } catch (Exception e) {
+                                    Log.e(e);
+                                }
+                            });
+                        }
+                        imageView.setVisibility(0);
+                    }
+                }
+            };
+            Class clz = Initiator.loadClass("com.tencent.mobileqq.aio.msglist.holder.component.msgfollow.AIOMsgFollowComponent");
+            for (Method method : clz.getDeclaredMethods()) {
+                Class<?>[] parameterTypes = method.getParameterTypes();
+                boolean z = true;
+                boolean z2 = parameterTypes.length == 0 && method.getReturnType().equals(ImageView.class);
+                if (parameterTypes.length != 3 || !parameterTypes[0].equals(Integer.TYPE) || !parameterTypes[2].equals(List.class)) {
+                    z = z2;
+                }
+                if (z) {
+                    XposedBridge.hookMethod(method, callback);
+                }
+            }
+            return true;
+        }
         Class<?> kChatAdapter1 = Initiator.load("com.tencent.mobileqq.activity.aio.ChatAdapter1");
         if (kChatAdapter1 == null) {
             Class<?> kGuildPieAdapter = Initiator.load("com.tencent.mobileqq.guild.chatpie.GuildPieAdapter");

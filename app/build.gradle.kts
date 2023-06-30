@@ -76,12 +76,13 @@ android {
                 val flags = arrayOf(
                     "-Qunused-arguments",
                     "-fno-rtti",
-                    "-fvisibility=hidden",
+                    "-fvisibility=protected",
                     "-fvisibility-inlines-hidden",
                     "-fno-omit-frame-pointer",
                     "-Wno-unused-value",
                     "-Wno-unused-variable",
                     "-Wno-unused-command-line-argument",
+                    "-DMMKV_DISABLE_CRYPT",
                 )
                 cppFlags("-std=c++20", *flags)
                 cFlags("-std=c18", *flags)
@@ -170,8 +171,8 @@ android {
     }
     applicationVariants.all {
         val variantCapped = name.capitalizeUS()
-        val mergeAssets = tasks.getByName("merge${variantCapped}Assets")
-        mergeAssets.dependsOn(generateEulaAndPrivacy)
+        tasks.findByName("lintVitalAnalyze${variantCapped}")?.dependsOn(mergeAssetsProvider)
+        mergeAssetsProvider.dependsOn(generateEulaAndPrivacy)
     }
 }
 
@@ -212,6 +213,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.sealedEnum.runtime)
     implementation(libs.glide)
+    implementation(libs.byte.buddy.android)
     ksp(libs.sealedEnum.ksp)
 }
 
@@ -278,7 +280,7 @@ tasks.register("checkGitSubmodule") {
             .filter { it.startsWith(prefix) && it.endsWith(suffix) }
             .map { it.substring(prefix.length, it.length - suffix.length) }
         capturedSubmodulePaths.forEach {
-            val submoduleDir = File(projectDir, it + "/.git")
+            val submoduleDir = File(projectDir, "$it/.git")
             if (!submoduleDir.exists()) {
                 error(
                     "submodule dir not found: $submoduleDir" +
