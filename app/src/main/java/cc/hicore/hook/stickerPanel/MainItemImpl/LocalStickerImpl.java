@@ -12,7 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import cc.hicore.Env;
 import cc.hicore.Utils.HttpUtils;
-import cc.hicore.hook.stickerPanel.Hooker.Emo_Btn_Hooker;
+import cc.hicore.hook.stickerPanel.Hooker.StickerPanelEntryHooker;
 import cc.hicore.hook.stickerPanel.ICreator;
 import cc.hicore.hook.stickerPanel.LocalDataHelper;
 import cc.hicore.hook.stickerPanel.MainPanelAdapter;
@@ -33,6 +33,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -114,7 +115,7 @@ public class LocalStickerImpl implements MainPanelAdapter.IMainPanelItem {
             try {
                 ExecutorService threadPool = Executors.newFixedThreadPool(8);
                 AtomicInteger finishCount = new AtomicInteger();
-                int taskCount = mPicItems.size();
+                CountDownLatch latch = new CountDownLatch(mPicItems.size());
                 for (LocalDataHelper.LocalPicItems item : mPicItems) {
                     threadPool.execute(() -> {
                         try {
@@ -140,16 +141,12 @@ public class LocalStickerImpl implements MainPanelAdapter.IMainPanelItem {
                         } catch (Exception e) {
                             XposedBridge.log(Log.getStackTraceString(e));
                         } finally {
+                            latch.countDown();
                             SyncUtils.runOnUiThread(() -> progressDialog.setMessage("正在更新表情包,请稍等...(" + finishCount.getAndIncrement() + "/" + mPicItems.size() + ")"));
                         }
                     });
                 }
-                while (true) {
-                    if (finishCount.get() == taskCount) {
-                        break;
-                    }
-                    Thread.sleep(100);
-                }
+                latch.await();
                 SyncUtils.runOnUiThread(progressDialog::dismiss);
                 Toasts.info(mContext,"已更新完成");
                 SyncUtils.runOnUiThread(ICreator::dismissAll);
@@ -185,13 +182,13 @@ public class LocalStickerImpl implements MainPanelAdapter.IMainPanelItem {
         img.setOnClickListener(v -> {
             if (coverView.startsWith("http://") || coverView.startsWith("https://")) {
                 HttpUtils.ProgressDownload(coverView, Env.app_save_path + "Cache/" + coverView.substring(coverView.lastIndexOf("/")), () -> {
-                    MsgSender.send_pic(SessionUtils.AIOParam2CommonChat(Emo_Btn_Hooker.AIOParam), Env.app_save_path + "Cache/" + coverView.substring(coverView.lastIndexOf("/")));
+                    MsgSender.send_pic(SessionUtils.AIOParam2CommonChat(StickerPanelEntryHooker.AIOParam), Env.app_save_path + "Cache/" + coverView.substring(coverView.lastIndexOf("/")));
                     RecentStickerHelper.addPicItemToRecentRecord(mPathInfo, item);
                 }, mContext);
                 ICreator.dismissAll();
 
             } else {
-                MsgSender.send_pic(SessionUtils.AIOParam2CommonChat(Emo_Btn_Hooker.AIOParam),
+                MsgSender.send_pic(SessionUtils.AIOParam2CommonChat(StickerPanelEntryHooker.AIOParam),
                         LocalDataHelper.getLocalItemPath(mPathInfo, item));
                 RecentStickerHelper.addPicItemToRecentRecord(mPathInfo, item);
                 ICreator.dismissAll();

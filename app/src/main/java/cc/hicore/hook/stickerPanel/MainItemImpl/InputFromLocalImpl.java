@@ -37,11 +37,12 @@ public class InputFromLocalImpl implements MainPanelAdapter.IMainPanelItem {
             } else {
                 EditText ed = new EditText(parent.getContext());
                 new AlertDialog.Builder(CommonContextWrapper.createAppCompatContext(parent.getContext()))
-                        .setTitle("输入表情包名称")
+                        .setTitle("输入分组名称")
                         .setView(ed)
-                        .setNegativeButton("确定导入", (dialog, which) -> {
+                        .setPositiveButton("确定导入", (dialog, which) -> {
                             inputWorker(parent.getContext(), path, ed.getText().toString());
-                        }).show();
+                        }).setNeutralButton("取消", null)
+                        .show();
             }
 
         });
@@ -121,10 +122,7 @@ public class InputFromLocalImpl implements MainPanelAdapter.IMainPanelItem {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(filePath, options);
-        if (options.outWidth == -1) {
-            return false;
-        }
-        return true;
+        return options.outWidth != -1;
     }
 
     @Override

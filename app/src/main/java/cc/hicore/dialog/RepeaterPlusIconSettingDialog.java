@@ -137,7 +137,6 @@ public class RepeaterPlusIconSettingDialog implements View.OnClickListener,
         // temporary
         if (HostInfo.requireMinQQVersion(QQVersion.QQ_8_9_63)) {
             check_showUpper.setEnabled(false);
-            check_showInMenu.setEnabled(false);
         }
 
         InputDPI.addTextChangedListener(this);
