@@ -22,6 +22,7 @@
 
 package me.ketal.hook
 
+import android.content.Context
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.method.LinkMovementMethod
@@ -29,17 +30,26 @@ import android.text.style.ClickableSpan
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.forEach
 import cc.ioctl.hook.profile.OpenProfileCard
+import cc.ioctl.util.ui.FaultyDialog
+import com.tencent.qqnt.kernel.nativeinterface.MsgRecord
+import com.tencent.qqnt.kernel.nativeinterface.TextElement
 import de.robv.android.xposed.XC_MethodHook
 import io.github.qauxv.base.annotation.UiItemAgentEntry
+import io.github.qauxv.bridge.ntapi.ChatTypeConstants
+import io.github.qauxv.bridge.ntapi.RelationNTUinAndUidApi
 import io.github.qauxv.dsl.FunctionEntryRouter
 import io.github.qauxv.hook.CommonSwitchFunctionHook
+import io.github.qauxv.ui.CommonContextWrapper
 import io.github.qauxv.util.Log
+import io.github.qauxv.util.Toasts
 import io.github.qauxv.util.isTim
 import me.ketal.dispacher.BaseBubbleBuilderHook
 import me.ketal.dispacher.OnBubbleBuilder
 import me.singleneuron.data.MsgRecordData
+import xyz.nextalone.util.SystemServiceUtils
 import xyz.nextalone.util.clazz
 import xyz.nextalone.util.findHostView
 import xyz.nextalone.util.get
@@ -86,6 +96,79 @@ object ShowMsgAt : CommonSwitchFunctionHook(), OnBubbleBuilder {
                 Log.d("暂不支持的控件类型--->$content")
                 return
             }
+        }
+    }
+
+    @JvmStatic
+    public fun createUnknownUidDialog(outerContext: Context, uid: String) {
+        val ctx = CommonContextWrapper.createAppCompatContext(outerContext)
+        // BTN: OK, COPY
+        AlertDialog.Builder(ctx)
+            .setTitle("未知的 UID")
+            .setMessage(uid)
+            .setPositiveButton("确认") { _, _ -> }
+            .setNegativeButton("复制") { _, _ ->
+                SystemServiceUtils.copyToClipboard(ctx, uid)
+                Toasts.show(ctx, "已复制到剪贴板")
+            }.show()
+    }
+
+    private fun createClickSpanForUid(uid: String?): ClickableSpan {
+        return object : ClickableSpan() {
+            override fun onClick(widget: View) {
+                val ctx = widget.context
+                if (uid?.startsWith("u_") == true) {
+                    try {
+                        val uin = RelationNTUinAndUidApi.getUinFromUid(uid)
+                        if (uin.isNullOrEmpty()) {
+                            createUnknownUidDialog(ctx, uid)
+                            return
+                        } else {
+                            OpenProfileCard.openUserProfileCard(ctx, uin.toLong())
+                        }
+                    } catch (e: Exception) {
+                        FaultyDialog.show(ctx, e)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun createAtSpanBySearch(text: String, atElements: List<TextElement>): SpannableString {
+        val ssb = SpannableString(text)
+        for (at in atElements) {
+            if (at.content.length >= 2) {
+                val uid = at.atNtUid
+                val start = text.indexOf(at.content)
+                if (start == -1) continue
+                val end = start + at.content.length
+                ssb.setSpan(createClickSpanForUid(uid), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+        }
+        return ssb
+    }
+
+    override fun onGetViewNt(rootView: ViewGroup, chatMessage: MsgRecord, param: XC_MethodHook.MethodHookParam) {
+        if (!isEnabled) return
+        if (chatMessage.chatType != ChatTypeConstants.GROUP) return
+        // MIX 2, REPLY 9, STRUCT_LONG_MSG 12
+        val msgType = chatMessage.msgType
+        if (msgType != 2 && msgType != 9 && msgType != 12) return
+        val elements = chatMessage.elements ?: return
+        val atElements = mutableListOf<TextElement>()
+        elements.forEach {
+            if (it.textElement != null && it.textElement.atType != 0) {
+                atElements.add(it.textElement)
+            }
+        }
+        if (atElements.isEmpty()) {
+            return
+        }
+        val tv = rootView.findHostView<TextView>("ex1")
+        // TODO 2023-07-16 有时候 ex1 会为空
+        tv?.let {
+            val spannable = createAtSpanBySearch(tv.text.toString(), atElements)
+            tv.text = spannable
         }
     }
 
