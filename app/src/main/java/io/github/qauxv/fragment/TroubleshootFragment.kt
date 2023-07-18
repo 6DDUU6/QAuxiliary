@@ -135,7 +135,7 @@ class TroubleshootFragment : BaseRootLayoutFragment() {
                 description(
                     "PID: " + android.os.Process.myPid() +
                         ", UID: " + android.os.Process.myUid() +
-                        ", " + (if (Natives.is64Bit()) "64 bit" else "32 bit") + "\n" +
+                        ", " + (if (android.os.Process.is64Bit()) "64 bit" else "32 bit") + "\n" +
                         "Xposed API version: " + XposedBridge.getXposedVersion() + "\n" +
                         HybridClassLoader.getXposedBridgeClassName(), isTextSelectable = true
                 )
