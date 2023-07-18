@@ -107,7 +107,7 @@ class HotUpdateConfigFragment : BaseRootLayoutFragment(), View.OnClickListener {
             androidx.appcompat.R.attr.colorAccent,
             R.color.colorAccent
         )
-        val secondTextColor = ResourcesCompat.getColor(ctx.resources, R.color.secondTextColor, ctx.theme)
+        val secondTextColor = ctx.getColor(R.color.secondTextColor)
         channelButtons.forEach {
             val channelId = viewIdToChannelId(it.id)
             if (currentChannel == channelId) {

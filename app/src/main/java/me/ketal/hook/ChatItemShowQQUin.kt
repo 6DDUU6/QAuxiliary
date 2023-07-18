@@ -39,7 +39,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SwitchCompat
-import androidx.core.content.res.ResourcesCompat
 import cc.ioctl.hook.msg.FlashPicHook
 import cc.ioctl.util.LayoutHelper
 import cc.ioctl.util.Reflex
@@ -132,17 +131,17 @@ object ChatItemShowQQUin : CommonConfigFunctionHook(), OnBubbleBuilder {
         val tvMsgFmt: EditText = AppCompatEditText(ctx).apply {
             setText(msgFormat)
             textSize = 16f
-            setTextColor(ResourcesCompat.getColor(ctx.resources, R.color.firstTextColor, ctx.theme))
+            setTextColor(ctx.resources.getColor(R.color.firstTextColor, ctx.theme))
             hint = "消息格式 (见可用占位符)"
         }
         val tvTimeFmt: EditText = AppCompatEditText(ctx).apply {
             setText(timeFormat)
             textSize = 16f
-            setTextColor(ResourcesCompat.getColor(ctx.resources, R.color.firstTextColor, ctx.theme))
+            setTextColor(ctx.resources.getColor(R.color.firstTextColor, ctx.theme))
             hint = "时间格式 yyyy-MM-dd HH:mm:ss"
         }
         val tvClickToAppend = AppCompatTextView(ctx).apply {
-            setTextColor(ResourcesCompat.getColor(ctx.resources, R.color.firstTextColor, ctx.theme))
+            setTextColor(ctx.resources.getColor(R.color.firstTextColor, ctx.theme))
             textSize = 14f
             movementMethod = LinkMovementMethod.getInstance()
             text = SpannableStringBuilder("消息格式 可用占位符(点击添加)\n").apply {
@@ -175,7 +174,7 @@ object ChatItemShowQQUin : CommonConfigFunctionHook(), OnBubbleBuilder {
             TextView(ctx).apply {
                 text = "消息格式"
                 textSize = 12f
-                setTextColor(ResourcesCompat.getColor(ctx.resources, R.color.secondTextColor, ctx.theme))
+                setTextColor(ctx.resources.getColor(R.color.secondTextColor, ctx.theme))
             }.also {
                 addView(it, lp)
             }
@@ -183,7 +182,7 @@ object ChatItemShowQQUin : CommonConfigFunctionHook(), OnBubbleBuilder {
             TextView(ctx).apply {
                 text = "时间格式 (如果上面没有用到 \${formatTime} 可以不用设置)"
                 textSize = 12f
-                setTextColor(ResourcesCompat.getColor(ctx.resources, R.color.secondTextColor, ctx.theme))
+                setTextColor(ctx.resources.getColor(R.color.secondTextColor, ctx.theme))
             }.also {
                 addView(it, lp)
             }
@@ -225,7 +224,7 @@ object ChatItemShowQQUin : CommonConfigFunctionHook(), OnBubbleBuilder {
                 textSize = 16f
                 setTextIsSelectable(true)
                 isVerticalScrollBarEnabled = true
-                setTextColor(ResourcesCompat.getColor(ctx.resources, R.color.firstTextColor, ctx.theme))
+                setTextColor(ctx.resources.getColor(R.color.firstTextColor, ctx.theme))
                 val dp24 = LayoutHelper.dip2px(ctx, 24f)
                 setPadding(dp24, 0, dp24, 0)
             }
