@@ -380,6 +380,12 @@ data object AbstractQQCustomMenuItem : DexKitTarget.UsingStr() {
     override val traitString = arrayOf("QQCustomMenuItem{title='")
     override val filter = DexKitFilter.strInClsName("com/tencent/qqnt/aio/menu/ui")
 }
+data object Guild_Emo_Btn_Create_QQNT : DexKitTarget.UsingStr() {
+    override val findMethod: Boolean = true
+    override val traitString = arrayOf("mEmojiLayout.findViewByI…id.guild_aio_emoji_image)")
+    override val declaringClass = "Guild_Emo_Btn_Create_QQNT"
+    override val filter = DexKitFilter.allowAll
+}
 
 data object NBaseChatPie_init : DexKitTarget.UsingStr() {
     override val findMethod: Boolean = true
@@ -695,6 +701,13 @@ data object AIO_Create_QQNT : DexKitTarget.UsingStr() {
     override val traitString = arrayOf("rootVMBuild")
     override val declaringClass = "AIO_Create_QQNT"
     override val filter = DexKitFilter.allowAll
+}
+
+data object AIO_InputRootInit_QQNT : DexKitTarget.UsingStr() {
+    override val findMethod: Boolean = true
+    override val traitString = arrayOf("inputRoot.findViewById(R.id.send_btn)")
+    override val declaringClass = ""
+    override val filter = DexKitFilter.strInClsName("com/tencent/mobileqq/aio/input")
 }
 
 data object EmoMsgUtils_isSingleLottie_QQNT : DexKitTarget.UsingStr() {
