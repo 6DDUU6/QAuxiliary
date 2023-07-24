@@ -53,6 +53,11 @@ sealed class DexKitTarget {
         abstract val traitString: Array<String>
     }
 
+    sealed class UsingStringVector : DexKitTarget() {
+        // relationship: ((v[0][0] && v[0][1] && ..) || (v[1][0] && v[1][1] && ..) || ..)
+        abstract val traitStringVectors: Array<Array<String>>
+    }
+
     sealed class UsingDexkit : DexKitTarget()
 
     abstract val declaringClass: String
@@ -750,4 +755,18 @@ data object NQZMoment_EntranceEnabled : DexKitTarget.UsingStr() {
     override val traitString = arrayOf("KEY_OPEN_QZMOMENT_ENTRANCE")
     override val declaringClass = ""
     override val filter = DexKitFilter.strInClsName("com/qzone/reborn/qzmoment/util")
+}
+
+data object DefaultFileModel : DexKitTarget.UsingStr() {
+    override val findMethod: Boolean = false
+    override val traitString = arrayOf("onVideoPlayerError : file entity is null")
+    override val declaringClass = "com.tencent.mobileqq.filemanager.fileviewer.model.DefaultFileModel"
+    override val filter = DexKitFilter.strInClsName("com.tencent.mobileqq.filemanager.fileviewer.model")
+}
+
+data object FileBrowserActivity_InnerClass_onItemClick : DexKitTarget.UsingStringVector() {
+    override val findMethod: Boolean = true
+    override val traitStringVectors: Array<Array<String>> = arrayOf(arrayOf("GeneralFileBrowserActivity", "reportShareActionSheetClick"))
+    override val declaringClass = ""
+    override val filter = DexKitFilter.strInClsName("FileBrowserActivity")
 }
