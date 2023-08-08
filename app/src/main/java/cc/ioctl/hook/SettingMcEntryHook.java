@@ -160,7 +160,7 @@ public class SettingMcEntryHook extends BasePersistBackgroundHook {
                 ClassLoader hostClassLoader = Initiator.getHostClassLoader();
                 Object func0 = Proxy.newProxyInstance(hostClassLoader, new Class<?>[]{thatFunction0}, (proxy, method, args) -> {
                     if (method.getName().equals("invoke")) {
-                        onSettingEntryClick(ctx);
+                        showMcSettingDialog(ctx);
                         return theUnit;
                     }
                     // must be sth from Object
