@@ -154,7 +154,7 @@ public class SettingMcEntryHook extends BasePersistBackgroundHook {
                 Parasitics.injectModuleResources(ctx.getResources());
                 @SuppressLint("DiscouragedApi")
                 int resId = ctx.getResources().getIdentifier("qui_tuning", "drawable", ctx.getPackageName());
-                Object entryItem = ctorSimpleItemProcessor.newInstance(ctx, R.id.setting2Activity_settingEntryItem, "QAuxiliary", resId);
+                Object entryItem = ctorSimpleItemProcessor.newInstance(ctx, R.id.setting2Activity_settingEntryItem, "McHookTool", resId);
                 Class<?> thatFunction0 = setOnClickListener.getParameterTypes()[0];
                 Object theUnit = thatFunction0.getClassLoader().loadClass("kotlin.Unit").getField("INSTANCE").get(null);
                 ClassLoader hostClassLoader = Initiator.getHostClassLoader();
