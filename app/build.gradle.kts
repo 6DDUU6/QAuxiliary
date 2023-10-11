@@ -111,7 +111,7 @@ android {
                 "-ffunction-sections",
                 "-fdata-sections",
                 "-Wl,--gc-sections",
-                "-Oz",
+                "-O3",
                 "-Wl,--exclude-libs,ALL",
                 "-DNDEBUG",
             )
@@ -133,7 +133,13 @@ android {
 //                "-DTEST_SIGNATURE",
             )
             externalNativeBuild.cmake {
-                arguments += "-DQAUXV_VERSION=${Version.versionName}.debug"
+                arguments.addAll(
+                    arrayOf(
+                        "-DQAUXV_VERSION=${Version.versionName}.debug",
+                        "-DCMAKE_CXX_FLAGS_DEBUG=-Og",
+                        "-DCMAKE_C_FLAGS_DEBUG=-Og",
+                    )
+                )
                 cFlags += debugFlags
                 cppFlags += debugFlags
             }
