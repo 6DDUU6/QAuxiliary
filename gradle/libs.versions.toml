@@ -36,6 +36,8 @@ colorpicker = { module = "com.jaredrummler:colorpicker", version = "1.1.0" }
 ezXHelper = { module = "com.github.kyuubiran:EzXHelper", version = "1.0.3" }
 confetti = { module = "com.github.jinatonic.confetti:confetti", version = "1.1.2" }
 weatherView = { module = "com.github.MatteoBattilana:WeatherView", version = "3.0.0" }
+okhttp = { module = "com.squareup.okhttp3:okhttp", version = "5.0.0-alpha.11"}
+gson = { module = "com.google.code.gson:gson", version = "2.6.2"}
 sealedEnum-runtime = { module = "com.github.livefront.sealed-enum:runtime", version.ref = "sealedEnum" }
 sealedEnum-ksp = { module = "com.github.livefront.sealed-enum:ksp", version.ref = "sealedEnum" }
 glide = { module = "com.github.bumptech.glide:glide", version = "4.16.0" }
