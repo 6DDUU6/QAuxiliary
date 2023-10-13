@@ -419,7 +419,7 @@ EXPORT extern "C" jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         env->ExceptionClear();
     }
 #if defined(NDEBUG) || defined(TEST_SIGNATURE)
-    if (!checkSignature(env, appInterface != nullptr)) {
+    if (!::teble::v2sign::checkSignature(env, appInterface != nullptr)) {
         return -1;
     }
 #endif
@@ -702,7 +702,7 @@ Java_io_github_qauxv_util_Natives_invokeNonVirtualImpl(JNIEnv *env, jclass,
     }
     // find return type, start from last ')'
     char returnTypeShort = 0;
-    for (auto i = methodSignature.length() - 1; i >= 0; i--) {
+    for (auto i = methodSignature.length() - 1; i > 0; i--) {
         if (methodSignature[i] == ')') {
             returnTypeShort = methodSignature[i + 1];
             break;
