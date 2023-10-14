@@ -28,6 +28,7 @@ import androidx.annotation.Nullable;
 import cc.ioctl.util.HookUtils;
 import cc.ioctl.util.HostInfo;
 import com.google.gson.Gson;
+import com.qq.taf.jce.HexUtil;
 import com.tencent.pb.emosm.EmosmPb$SubCmd0x2RspFetchTab$TabInfo;
 import de.robv.android.xposed.XposedBridge;
 import io.github.qauxv.base.annotation.FunctionHookEntry;
@@ -94,7 +95,7 @@ public class AddNewEmotion extends CommonSwitchFunctionHook {
             tabInfo.str_tab_name.set("天使恶魔小表情");
             Object oTabInfo = Initiator.loadClass("com.tencent.pb.emosm.EmosmPb$SubCmd0x2RspFetchTab$TabInfo").newInstance();
             Method mergeFrom = oTabInfo.getClass().getMethod("mergeFrom", byte[].class);
-            Object o = mergeFrom.invoke(oTabInfo, tabInfo.toByteArray());
+            Object o = mergeFrom.invoke(oTabInfo, HexUtil.hexStr2Bytes("2A24082615000000001801200128053215E5A4A9E4BDBFE681B6E9AD94E5B08FE8A1A8E68385"););
             listTabInfo.add(o);
             XposedBridge.log("Add emotion listlen:" + listTabInfo.size());
             idList.add("38");
