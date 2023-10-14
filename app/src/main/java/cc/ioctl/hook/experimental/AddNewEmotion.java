@@ -43,6 +43,7 @@ import io.github.qauxv.util.dexkit.DexKitTarget;
 import io.github.qauxv.util.dexkit.EmoticonHandler_handleSmallEmotion;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @FunctionHookEntry
@@ -81,7 +82,7 @@ public class AddNewEmotion extends CommonSwitchFunctionHook {
     public boolean initOnce() throws Exception {
         Method method = DexKit.requireMethodFromCache(EmoticonHandler_handleSmallEmotion.INSTANCE);
         HookUtils.hookBeforeIfEnabled(this, method, param -> {
-            ArrayList<EmosmPb$SubCmd0x2RspFetchTab$TabInfo> listTabInfo = (ArrayList<EmosmPb$SubCmd0x2RspFetchTab$TabInfo>) param.args[3];
+            List<EmosmPb$SubCmd0x2RspFetchTab$TabInfo> listTabInfo = (List<EmosmPb$SubCmd0x2RspFetchTab$TabInfo>) param.args[3];
             ArrayList<String> idList = (ArrayList<String>) param.args[4];
             EmosmPb$SubCmd0x2RspFetchTab$TabInfo tabInfo = new EmosmPb$SubCmd0x2RspFetchTab$TabInfo();
             tabInfo.int32_tab_type.set(38);
@@ -91,6 +92,7 @@ public class AddNewEmotion extends CommonSwitchFunctionHook {
             tabInfo.int32_tab_type.set(5);
             tabInfo.str_tab_name.set("天使恶魔小表情");
             listTabInfo.add(tabInfo);
+            XposedBridge.log("Add emotion str:" + new Gson().toJson(listTabInfo));
             idList.add("38");
         });
         HookUtils.hookAfterIfEnabled(this, method, param -> XposedBridge.log("Add emotion result:" + new Gson().toJson(param.args[1])));
