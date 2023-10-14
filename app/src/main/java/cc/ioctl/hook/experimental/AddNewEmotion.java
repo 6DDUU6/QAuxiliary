@@ -83,25 +83,25 @@ public class AddNewEmotion extends CommonSwitchFunctionHook {
     public boolean initOnce() throws Exception {
         Method method = DexKit.requireMethodFromCache(EmoticonHandler_handleSmallEmotion.INSTANCE);
         HookUtils.hookBeforeIfEnabled(this, method, param -> {
-            List<EmosmPb$SubCmd0x2RspFetchTab$TabInfo> listTabInfo = (List<EmosmPb$SubCmd0x2RspFetchTab$TabInfo>) param.args[3];
+            List<Object> listTabInfo = (List<Object>) param.args[3];
             ArrayList<String> idList = (ArrayList<String>) param.args[4];
-//            if (listTabInfo.size() > 0) {
-//                Object lastTabInfo = listTabInfo.get(listTabInfo.size() - 1);
-//                Field uint32TabId = lastTabInfo.getClass().getField("uint32_tab_id");
-//                uint32TabId.setAccessible(true);
-//                Object pbField = uint32TabId.get(lastTabInfo);
-//                Field value = pbField.getClass().getDeclaredField("value");
-//                value.setAccessible(true);
-//                value.set(pbField, 38);
-//            }
-            EmosmPb$SubCmd0x2RspFetchTab$TabInfo tabInfo = new EmosmPb$SubCmd0x2RspFetchTab$TabInfo();
-            tabInfo.uint32_tab_id.set(38);
-            tabInfo.fixed32_expire_time.set(0);
-            tabInfo.uint32_flags.set(1);
-            tabInfo.int32_wording_id.set(1);
-            tabInfo.int32_tab_type.set(5);
-            tabInfo.str_tab_name.set("天使恶魔小表情");
-            listTabInfo.add(tabInfo);
+            if (listTabInfo.size() > 0) {
+                Object lastTabInfo = listTabInfo.get(listTabInfo.size() - 1);
+                Field uint32TabId = lastTabInfo.getClass().getField("uint32_tab_id");
+                uint32TabId.setAccessible(true);
+                Object pbField = uint32TabId.get(lastTabInfo);
+                Field value = pbField.getClass().getDeclaredField("value");
+                value.setAccessible(true);
+                value.set(pbField, 38);
+            }
+//            EmosmPb$SubCmd0x2RspFetchTab$TabInfo tabInfo = new EmosmPb$SubCmd0x2RspFetchTab$TabInfo();
+//            tabInfo.uint32_tab_id.set(38);
+//            tabInfo.fixed32_expire_time.set(0);
+//            tabInfo.uint32_flags.set(1);
+//            tabInfo.int32_wording_id.set(1);
+//            tabInfo.int32_tab_type.set(5);
+//            tabInfo.str_tab_name.set("天使恶魔小表情");
+//            listTabInfo.add(tabInfo);
             XposedBridge.log("Add emotion listlen:" + listTabInfo.size());
             idList.add("38");
         });
