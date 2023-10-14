@@ -85,7 +85,7 @@ public class AddNewEmotion extends CommonSwitchFunctionHook {
             List<EmosmPb$SubCmd0x2RspFetchTab$TabInfo> listTabInfo = (List<EmosmPb$SubCmd0x2RspFetchTab$TabInfo>) param.args[3];
             ArrayList<String> idList = (ArrayList<String>) param.args[4];
             EmosmPb$SubCmd0x2RspFetchTab$TabInfo tabInfo = new EmosmPb$SubCmd0x2RspFetchTab$TabInfo();
-            tabInfo.int32_tab_type.set(38);
+            tabInfo.uint32_tab_id.set(38);
             tabInfo.fixed32_expire_time.set(0);
             tabInfo.uint32_flags.set(1);
             tabInfo.int32_wording_id.set(1);
