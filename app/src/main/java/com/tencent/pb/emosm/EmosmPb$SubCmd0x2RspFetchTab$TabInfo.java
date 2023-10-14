@@ -20,7 +20,7 @@
  * <https://github.com/cinit/QAuxiliary/blob/master/LICENSE.md>.
  */
 
-package com.akashi.pb;
+package com.tencent.pb.emosm;
 
 import com.tencent.mobileqq.pb.MessageMicro;
 import com.tencent.mobileqq.pb.PBField;
@@ -29,7 +29,6 @@ import com.tencent.mobileqq.pb.PBInt32Field;
 import com.tencent.mobileqq.pb.PBStringField;
 import com.tencent.mobileqq.pb.PBUInt32Field;
 
-// class@0027f3 from classes3.dex
 public final class EmosmPb$SubCmd0x2RspFetchTab$TabInfo extends MessageMicro<EmosmPb$SubCmd0x2RspFetchTab$TabInfo> {
 
     public final PBFixed32Field fixed32_expire_time = PBField.initFixed32(0);

@@ -27,8 +27,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import cc.ioctl.util.HookUtils;
 import cc.ioctl.util.HostInfo;
-import com.akashi.pb.EmosmPb$SubCmd0x2RspFetchTab$TabInfo;
 import com.google.gson.Gson;
+import com.tencent.pb.emosm.EmosmPb$SubCmd0x2RspFetchTab$TabInfo;
 import de.robv.android.xposed.XposedBridge;
 import io.github.qauxv.base.annotation.FunctionHookEntry;
 import io.github.qauxv.base.annotation.UiItemAgentEntry;
@@ -41,6 +41,7 @@ import io.github.qauxv.util.dexkit.CPopOutEmoticonUtil;
 import io.github.qauxv.util.dexkit.DexKit;
 import io.github.qauxv.util.dexkit.DexKitTarget;
 import io.github.qauxv.util.dexkit.EmoticonHandler_handleSmallEmotion;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -84,6 +85,15 @@ public class AddNewEmotion extends CommonSwitchFunctionHook {
         HookUtils.hookBeforeIfEnabled(this, method, param -> {
             List<EmosmPb$SubCmd0x2RspFetchTab$TabInfo> listTabInfo = (List<EmosmPb$SubCmd0x2RspFetchTab$TabInfo>) param.args[3];
             ArrayList<String> idList = (ArrayList<String>) param.args[4];
+//            if (listTabInfo.size() > 0) {
+//                Object lastTabInfo = listTabInfo.get(listTabInfo.size() - 1);
+//                Field uint32TabId = lastTabInfo.getClass().getField("uint32_tab_id");
+//                uint32TabId.setAccessible(true);
+//                Object pbField = uint32TabId.get(lastTabInfo);
+//                Field value = pbField.getClass().getDeclaredField("value");
+//                value.setAccessible(true);
+//                value.set(pbField, 38);
+//            }
             EmosmPb$SubCmd0x2RspFetchTab$TabInfo tabInfo = new EmosmPb$SubCmd0x2RspFetchTab$TabInfo();
             tabInfo.uint32_tab_id.set(38);
             tabInfo.fixed32_expire_time.set(0);
