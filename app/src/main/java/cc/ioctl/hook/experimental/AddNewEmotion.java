@@ -92,7 +92,7 @@ public class AddNewEmotion extends CommonSwitchFunctionHook {
             tabInfo.int32_tab_type.set(5);
             tabInfo.str_tab_name.set("天使恶魔小表情");
             listTabInfo.add(tabInfo);
-            XposedBridge.log("Add emotion str:" + new Gson().toJson(listTabInfo));
+            XposedBridge.log("Add emotion listlen:" + listTabInfo.size());
             idList.add("38");
         });
         HookUtils.hookAfterIfEnabled(this, method, param -> XposedBridge.log("Add emotion result:" + new Gson().toJson(param.args[1])));
