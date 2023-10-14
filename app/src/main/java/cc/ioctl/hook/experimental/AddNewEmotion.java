@@ -26,7 +26,10 @@ import static io.github.qauxv.util.HostInfo.requireMinQQVersion;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import cc.ioctl.util.HookUtils;
+import cc.ioctl.util.HostInfo;
 import com.akashi.pb.EmosmPb$SubCmd0x2RspFetchTab$TabInfo;
+import com.google.gson.Gson;
+import de.robv.android.xposed.XposedBridge;
 import io.github.qauxv.base.annotation.FunctionHookEntry;
 import io.github.qauxv.base.annotation.UiItemAgentEntry;
 import io.github.qauxv.dsl.FunctionEntryRouter;
@@ -90,6 +93,7 @@ public class AddNewEmotion extends CommonSwitchFunctionHook {
             listTabInfo.add(tabInfo);
             idList.add("38");
         });
+        HookUtils.hookAfterIfEnabled(this, method, param -> XposedBridge.log("Add emotion result:" + new Gson().toJson(param.args[1])));
         return true;
     }
 }
