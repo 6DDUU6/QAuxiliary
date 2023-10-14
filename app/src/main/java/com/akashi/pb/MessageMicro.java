@@ -6,10 +6,12 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 
 public abstract class MessageMicro<T extends MessageMicro<T>> extends PBPrimitiveField<T> {
+
     private FieldMap _fields = null;
     private int cachedSize = -1;
 
     public static final class FieldMap {
+
         private Object[] defaultValues;
         private Field[] fields;
         private int[] tags;
@@ -67,7 +69,8 @@ public abstract class MessageMicro<T extends MessageMicro<T>> extends PBPrimitiv
             return i;
         }
 
-        public boolean readFieldFrom(CodedInputStreamMicro codedInputStreamMicro, int i, MessageMicro<?> messageMicro) throws IOException, IllegalArgumentException, IllegalAccessException, InstantiationException {
+        public boolean readFieldFrom(CodedInputStreamMicro codedInputStreamMicro, int i, MessageMicro<?> messageMicro)
+                throws IOException, IllegalArgumentException, IllegalAccessException, InstantiationException {
             int binarySearch = Arrays.binarySearch(this.tags, i);
             if (binarySearch < 0) {
                 return false;
@@ -76,7 +79,8 @@ public abstract class MessageMicro<T extends MessageMicro<T>> extends PBPrimitiv
             return true;
         }
 
-        void writeTo(CodedOutputStreamMicro codedOutputStreamMicro, MessageMicro<?> messageMicro) throws IllegalArgumentException, IllegalAccessException, IOException {
+        void writeTo(CodedOutputStreamMicro codedOutputStreamMicro, MessageMicro<?> messageMicro)
+                throws IllegalArgumentException, IllegalAccessException, IOException {
             int i = 0;
             while (true) {
                 int i2 = i;
@@ -91,21 +95,20 @@ public abstract class MessageMicro<T extends MessageMicro<T>> extends PBPrimitiv
     }
 
     private final FieldMap getFieldMap() {
-        if (this._fields == null) {
-            try {
-                Field declaredField = getClass().getDeclaredField("__fieldMap__");
-                declaredField.setAccessible(true);
-                this._fields = (FieldMap) declaredField.get(this);
-                XposedBridge.log("__fieldMap__:" + (this._fields == null));
-            } catch (NoSuchFieldException e) {
-                e.printStackTrace();
-            } catch (SecurityException e2) {
-                e2.printStackTrace();
-            } catch (IllegalArgumentException e3) {
-                e3.printStackTrace();
-            } catch (IllegalAccessException e4) {
-                e4.printStackTrace();
-            }
+        try {
+            Field declaredField = getClass().getDeclaredField("__fieldMap__");
+            declaredField.setAccessible(true);
+            this._fields = (FieldMap) declaredField.get(this);
+            XposedBridge.log("__fieldMap__:" + (this._fields == null));
+            return this._fields;
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (SecurityException e2) {
+            e2.printStackTrace();
+        } catch (IllegalArgumentException e3) {
+            e3.printStackTrace();
+        } catch (IllegalAccessException e4) {
+            e4.printStackTrace();
         }
         return this._fields;
     }
