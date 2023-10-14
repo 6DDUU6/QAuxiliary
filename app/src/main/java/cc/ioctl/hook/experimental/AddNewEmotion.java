@@ -26,6 +26,7 @@ import static io.github.qauxv.util.HostInfo.requireMinQQVersion;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import cc.ioctl.util.HookUtils;
+import com.akashi.pb.EmosmPb$SubCmd0x2RspFetchTab$TabInfo;
 import io.github.qauxv.base.annotation.FunctionHookEntry;
 import io.github.qauxv.base.annotation.UiItemAgentEntry;
 import io.github.qauxv.dsl.FunctionEntryRouter;
@@ -77,8 +78,17 @@ public class AddNewEmotion extends CommonSwitchFunctionHook {
     public boolean initOnce() throws Exception {
         Method method = DexKit.requireMethodFromCache(EmoticonHandler_handleSmallEmotion.INSTANCE);
         HookUtils.hookBeforeIfEnabled(this, method, param -> {
-            ArrayList<String> aList = (ArrayList) param.args[4];
-            aList.add("38");
+            ArrayList<EmosmPb$SubCmd0x2RspFetchTab$TabInfo> listTabInfo = (ArrayList<EmosmPb$SubCmd0x2RspFetchTab$TabInfo>) param.args[3];
+            ArrayList<String> idList = (ArrayList<String>) param.args[4];
+            EmosmPb$SubCmd0x2RspFetchTab$TabInfo tabInfo = new EmosmPb$SubCmd0x2RspFetchTab$TabInfo();
+            tabInfo.int32_tab_type.set(38);
+            tabInfo.fixed32_expire_time.set(0);
+            tabInfo.uint32_flags.set(1);
+            tabInfo.int32_wording_id.set(1);
+            tabInfo.int32_tab_type.set(5);
+            tabInfo.str_tab_name.set("天使恶魔小表情");
+            listTabInfo.add(tabInfo);
+            idList.add("38");
         });
         return true;
     }
