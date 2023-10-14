@@ -664,6 +664,13 @@ data object PaiYiPaiHandler_canSendReq : DexKitTarget.UsingStr() {
     override val filter = DexKitFilter.allowAll
 }
 
+data object EmoticonHandler_handleSmallEmotion : DexKitTarget.UsingStr() {
+    override val findMethod: Boolean = true
+    override val declaringClass = "com/tencent/mobileqq/app/EmoticonHandler"
+    override val traitString = arrayOf("TYPE_EMOSM_PS_FETCH: small emotion")
+    override val filter = DexKitFilter.allowAll
+}
+
 data object GrayCheckHandler_Check : DexKitTarget.UsingStr() {
     override val findMethod: Boolean = true
     override val declaringClass = "com/tencent/mobileqq/graycheck/business/GrayCheckHandler"
