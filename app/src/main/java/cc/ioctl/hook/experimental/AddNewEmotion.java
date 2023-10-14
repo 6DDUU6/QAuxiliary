@@ -86,16 +86,13 @@ public class AddNewEmotion extends CommonSwitchFunctionHook {
         HookUtils.hookBeforeIfEnabled(this, method, param -> {
             List<Object> listTabInfo = (List<Object>) param.args[3];
             ArrayList<String> idList = (ArrayList<String>) param.args[4];
-            XposedBridge.log("Add========1=========");
             EmosmPb.SubCmd0x2RspFetchTab.TabInfo tabInfo = new EmosmPb.SubCmd0x2RspFetchTab.TabInfo();
-            XposedBridge.log("Add========2=========");
             tabInfo.uint32_tab_id.set(38);
             tabInfo.fixed32_expire_time.set(0);
             tabInfo.uint32_flags.set(1);
             tabInfo.int32_wording_id.set(1);
             tabInfo.int32_tab_type.set(5);
             tabInfo.str_tab_name.set("天使恶魔小表情");
-            XposedBridge.log("Add========3=========");
             byte[] data = tabInfo.toByteArray();
             Object oTabInfo = Initiator.loadClass("com.tencent.pb.emosm.EmosmPb$SubCmd0x2RspFetchTab$TabInfo").newInstance();
             Method mergeFrom = oTabInfo.getClass().getMethod("mergeFrom", byte[].class);

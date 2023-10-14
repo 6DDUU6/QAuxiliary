@@ -62,7 +62,6 @@ public abstract class MessageMicro<T extends MessageMicro<T>> extends PBPrimitiv
         }
 
         int getSerializedSize(MessageMicro<?> messageMicro) throws IllegalArgumentException, IllegalAccessException {
-            XposedBridge.log("Add========8=========");
             int i = 0;
             for (int i2 = 0; i2 < this.tags.length; i2++) {
                 i += ((PBField) this.fields[i2].get(messageMicro)).computeSize(WireFormatMicro.getTagFieldNumber(this.tags[i2]));
@@ -97,10 +96,13 @@ public abstract class MessageMicro<T extends MessageMicro<T>> extends PBPrimitiv
 
     private final FieldMap getFieldMap() {
         try {
-            XposedBridge.log("Add========7=========");
+            XposedBridge.log("Add========1=========");
             Field declaredField = getClass().getDeclaredField("__fieldMap__");
+            XposedBridge.log("Add========2=========");
             declaredField.setAccessible(true);
+            XposedBridge.log("Add========3=========");
             this._fields = (FieldMap) declaredField.get(this);
+            XposedBridge.log("Add========4=========");
             XposedBridge.log("__fieldMap__:" + (this._fields == null));
             return this._fields;
         } catch (NoSuchFieldException e) {
@@ -171,9 +173,7 @@ public abstract class MessageMicro<T extends MessageMicro<T>> extends PBPrimitiv
     public final int getSerializedSize() {
         int i = -1;
         try {
-            XposedBridge.log("Add========5=========");
             i = getFieldMap().getSerializedSize(this);
-            XposedBridge.log("Add========6=========");
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e2) {
@@ -261,9 +261,7 @@ public abstract class MessageMicro<T extends MessageMicro<T>> extends PBPrimitiv
     }
 
     public final byte[] toByteArray() {
-        XposedBridge.log("Add========4=========");
         byte[] bArr = new byte[getSerializedSize()];
-        XposedBridge.log("Add========9=========");
         toByteArray(bArr, 0, bArr.length);
         return bArr;
     }
