@@ -95,28 +95,24 @@ public abstract class MessageMicro<T extends MessageMicro<T>> extends PBPrimitiv
     }
 
     private final FieldMap getFieldMap() {
-        try {
-            XposedBridge.log("Add========1=========");
-            Field declaredField = getClass().getDeclaredField("__fieldMap__");
-            XposedBridge.log("Add========2=========");
-            declaredField.setAccessible(true);
-            XposedBridge.log("Add========3=========");
-            this._fields = (FieldMap) declaredField.get(this);
-            XposedBridge.log("Add========4=========");
-            XposedBridge.log("__fieldMap__:" + (this._fields == null));
-            return this._fields;
-        } catch (NoSuchFieldException e) {
-            XposedBridge.log("NoSuchFieldException" + e.getMessage());
-            e.printStackTrace();
-        } catch (SecurityException e2) {
-            XposedBridge.log("SecurityException" + e2.getMessage());
-            e2.printStackTrace();
-        } catch (IllegalArgumentException e3) {
-            XposedBridge.log("IllegalArgumentException" + e3.getMessage());
-            e3.printStackTrace();
-        } catch (IllegalAccessException e4) {
-            XposedBridge.log("IllegalAccessException" + e4.getMessage());
-            e4.printStackTrace();
+        if (this._fields == null) {
+            try {
+                Field declaredField = getClass().getDeclaredField("__fieldMap__");
+                declaredField.setAccessible(true);
+                this._fields = (FieldMap) declaredField.get(this);
+                return this._fields;
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+            } catch (SecurityException e2) {
+                XposedBridge.log("SecurityException" + e2.getMessage());
+                e2.printStackTrace();
+            } catch (IllegalArgumentException e3) {
+                XposedBridge.log("IllegalArgumentException" + e3.getMessage());
+                e3.printStackTrace();
+            } catch (IllegalAccessException e4) {
+                XposedBridge.log("IllegalAccessException" + e4.getMessage());
+                e4.printStackTrace();
+            }
         }
         return this._fields;
     }
@@ -288,5 +284,9 @@ public abstract class MessageMicro<T extends MessageMicro<T>> extends PBPrimitiv
 
     protected void writeToDirectly(CodedOutputStreamMicro codedOutputStreamMicro, int i, T t) throws IOException {
         codedOutputStreamMicro.writeMessage(i, t);
+    }
+
+    public void setFields(FieldMap fieldMap) {
+        this._fields = fieldMap;
     }
 }

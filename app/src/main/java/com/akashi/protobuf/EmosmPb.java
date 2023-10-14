@@ -41,6 +41,11 @@ public final class EmosmPb {
             public final PBStringField str_tab_name = PBField.initString("");
             public final PBUInt32Field uint32_flags = PBField.initUInt32(0);
             public final PBUInt32Field uint32_tab_id = PBField.initUInt32(0);
+
+            public TabInfo() {
+                super();
+                setFields(__fieldMap__);
+            }
         }
     }
 }
