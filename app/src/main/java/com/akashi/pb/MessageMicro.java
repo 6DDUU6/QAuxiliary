@@ -1,5 +1,6 @@
 package com.akashi.pb;
 
+import de.robv.android.xposed.XposedBridge;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -95,6 +96,7 @@ public abstract class MessageMicro<T extends MessageMicro<T>> extends PBPrimitiv
                 Field declaredField = getClass().getDeclaredField("__fieldMap__");
                 declaredField.setAccessible(true);
                 this._fields = (FieldMap) declaredField.get(this);
+                XposedBridge.log("__fieldMap__:" + (this._fields == null));
             } catch (NoSuchFieldException e) {
                 e.printStackTrace();
             } catch (SecurityException e2) {

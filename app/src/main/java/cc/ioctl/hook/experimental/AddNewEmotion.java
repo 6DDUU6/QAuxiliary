@@ -93,9 +93,10 @@ public class AddNewEmotion extends CommonSwitchFunctionHook {
             tabInfo.int32_wording_id.set(1);
             tabInfo.int32_tab_type.set(5);
             tabInfo.str_tab_name.set("天使恶魔小表情");
+            byte[] data = tabInfo.toByteArray();
             Object oTabInfo = Initiator.loadClass("com.tencent.pb.emosm.EmosmPb$SubCmd0x2RspFetchTab$TabInfo").newInstance();
             Method mergeFrom = oTabInfo.getClass().getMethod("mergeFrom", byte[].class);
-            Object o = mergeFrom.invoke(oTabInfo, tabInfo.toByteArray());
+            Object o = mergeFrom.invoke(oTabInfo, data);
             listTabInfo.add(o);
             XposedBridge.log("Add emotion listlen:" + listTabInfo.size());
             idList.add("38");
