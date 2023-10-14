@@ -20,14 +20,14 @@
  * <https://github.com/cinit/QAuxiliary/blob/master/LICENSE.md>.
  */
 
-package com.tencent.pb.emosm;
+package com.akashi.protobuf;
 
-import com.tencent.mobileqq.pb.MessageMicro;
-import com.tencent.mobileqq.pb.PBField;
-import com.tencent.mobileqq.pb.PBFixed32Field;
-import com.tencent.mobileqq.pb.PBInt32Field;
-import com.tencent.mobileqq.pb.PBStringField;
-import com.tencent.mobileqq.pb.PBUInt32Field;
+import com.akashi.pb.MessageMicro;
+import com.akashi.pb.PBField;
+import com.akashi.pb.PBFixed32Field;
+import com.akashi.pb.PBInt32Field;
+import com.akashi.pb.PBStringField;
+import com.akashi.pb.PBUInt32Field;
 
 public final class EmosmPb {
     public static final class SubCmd0x2RspFetchTab {

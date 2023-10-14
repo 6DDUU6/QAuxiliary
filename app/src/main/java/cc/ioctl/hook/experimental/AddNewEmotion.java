@@ -29,7 +29,7 @@ import cc.ioctl.util.HookUtils;
 import cc.ioctl.util.HostInfo;
 import com.google.gson.Gson;
 import com.qq.taf.jce.HexUtil;
-import com.tencent.pb.emosm.EmosmPb;
+import com.akashi.protobuf.EmosmPb;
 import de.robv.android.xposed.XposedBridge;
 import io.github.qauxv.base.annotation.FunctionHookEntry;
 import io.github.qauxv.base.annotation.UiItemAgentEntry;
