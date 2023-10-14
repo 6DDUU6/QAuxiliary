@@ -73,21 +73,19 @@ public class EnableDynamicAvatar extends CommonSwitchFunctionHook {
 
     @Override
     public boolean initOnce() throws Exception {
-        {
-            Class<?> ZPlanApiImpl = Initiator.load("com/tencent/mobileqq/zplan/api/impl/ZPlanApiImpl");
-            Objects.requireNonNull(ZPlanApiImpl, "ZPlanApiImpl is null");
-            if (ZPlanApiImpl != null) {
-                Method method = ZPlanApiImpl.getDeclaredMethod("isZPlanAvatarSettingEnable");
-                Objects.requireNonNull(method, "isZPlanAvatarSettingEnable method is null");
-                HookUtils.hookBeforeIfEnabled(this, method, 47, param -> param.setResult(true));
-            }
-            Class<?> WinkEditorResourceAPIImpl = Initiator.load("com/tencent/mobileqq/wink/api/impl/WinkEditorResourceAPIImpl");
-            Objects.requireNonNull(WinkEditorResourceAPIImpl, "WinkEditorResourceAPIImpl is null");
-            if (WinkEditorResourceAPIImpl != null) {
-                Method methodq = WinkEditorResourceAPIImpl.getDeclaredMethod("queryAB", String.class, String.class, boolean.class);
-                Objects.requireNonNull(methodq, "queryAB method is null");
-                HookUtils.hookBeforeIfEnabled(this, methodq, 47, param -> param.setResult(true));
-            }
+        Class<?> ZPlanApiImpl = Initiator.load("com/tencent/mobileqq/zplan/api/impl/ZPlanApiImpl");
+        Objects.requireNonNull(ZPlanApiImpl, "ZPlanApiImpl is null");
+        if (ZPlanApiImpl != null) {
+            Method method = ZPlanApiImpl.getDeclaredMethod("isZPlanAvatarSettingEnable");
+            Objects.requireNonNull(method, "isZPlanAvatarSettingEnable method is null");
+            HookUtils.hookBeforeIfEnabled(this, method, 47, param -> param.setResult(true));
+        }
+        Class<?> WinkEditorResourceAPIImpl = Initiator.load("com/tencent/mobileqq/wink/api/impl/WinkEditorResourceAPIImpl");
+        Objects.requireNonNull(WinkEditorResourceAPIImpl, "WinkEditorResourceAPIImpl is null");
+        if (WinkEditorResourceAPIImpl != null) {
+            Method methodq = WinkEditorResourceAPIImpl.getDeclaredMethod("queryAB", String.class, String.class, boolean.class);
+            Objects.requireNonNull(methodq, "queryAB method is null");
+            HookUtils.hookBeforeIfEnabled(this, methodq, 47, param -> param.setResult(true));
         }
         return true;
     }
