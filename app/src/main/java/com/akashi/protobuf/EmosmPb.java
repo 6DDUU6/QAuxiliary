@@ -32,7 +32,7 @@ import com.akashi.pb.PBUInt32Field;
 public final class EmosmPb {
     public static final class SubCmd0x2RspFetchTab {
         public static final class TabInfo extends MessageMicro<TabInfo> {
-            static final MessageMicro.FieldMap __fieldMap__ = MessageMicro.initFieldMap(new int[]{8, 21, 24, 32, '(', '2'},
+            private static final MessageMicro.FieldMap __fieldMap__ = MessageMicro.initFieldMap(new int[]{8, 21, 24, 32, '(', '2'},
                     new String[]{"uint32_tab_id", "fixed32_expire_time", "uint32_flags", "int32_wording_id", "int32_tab_type", "str_tab_name"},
                     new Object[]{0, 0, 0, 0, 0, ""}, TabInfo.class);
             public final PBFixed32Field fixed32_expire_time = PBField.initFixed32(0);

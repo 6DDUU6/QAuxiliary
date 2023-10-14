@@ -106,12 +106,16 @@ public abstract class MessageMicro<T extends MessageMicro<T>> extends PBPrimitiv
             XposedBridge.log("__fieldMap__:" + (this._fields == null));
             return this._fields;
         } catch (NoSuchFieldException e) {
+            XposedBridge.log("NoSuchFieldException" + e.getMessage());
             e.printStackTrace();
         } catch (SecurityException e2) {
+            XposedBridge.log("SecurityException" + e2.getMessage());
             e2.printStackTrace();
         } catch (IllegalArgumentException e3) {
+            XposedBridge.log("IllegalArgumentException" + e3.getMessage());
             e3.printStackTrace();
         } catch (IllegalAccessException e4) {
+            XposedBridge.log("IllegalAccessException" + e4.getMessage());
             e4.printStackTrace();
         }
         return this._fields;
