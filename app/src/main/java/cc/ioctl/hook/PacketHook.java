@@ -657,7 +657,7 @@ public class PacketHook {
             if (clz == null) {
                 log("McHookTool: tools.util isnull");
             }
-            byte[] guid = (byte[]) XposedHelpers.callStaticMethod(clz, "get_last_guid", ctx);
+            byte[] guid = (byte[]) XposedHelpers.callStaticMethod(clz, "getGuidFromFile", ctx);
             McHookStatus.setGuidValue(HexUtil.bytes2HexStr(guid));
             return true;
         } catch (Throwable e) {
