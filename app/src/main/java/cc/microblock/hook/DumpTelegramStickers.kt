@@ -18,11 +18,14 @@ import io.github.qauxv.dsl.FunctionEntryRouter
 import io.github.qauxv.hook.CommonSwitchFunctionHook
 import io.github.qauxv.util.Initiator
 import io.github.qauxv.util.Log
+import io.github.qauxv.util.QQVersion
+import io.github.qauxv.util.requireMinQQVersion
 import xyz.nextalone.util.get
 import xyz.nextalone.util.invoke
 import xyz.nextalone.util.method
 import xyz.nextalone.util.set
 import java.io.File
+import java.util.concurrent.Executors
 
 abstract class ExtraEmoticon {
 //    abstract fun emoticonId(): String
@@ -32,7 +35,7 @@ abstract class ExtraEmoticon {
 
 abstract class ExtraEmoticonPanel {
     abstract fun emoticons(): List<ExtraEmoticon>
-    abstract fun emoticonPanelIconURL(): String
+    abstract fun emoticonPanelIconURL(): String?
     abstract fun uniqueId(): String;
 }
 
@@ -52,13 +55,15 @@ fun listDir (dir: String): List<String> {
     return list
 }
 
+val executor = Executors.newFixedThreadPool(5)
 val allowedExtensions = listOf(".png", ".jpg", ".jpeg", ".gif", ".webp");
 
 class LocalDocumentEmoticonProvider : ExtraEmoticonProvider() {
     class Panel(path: String) : ExtraEmoticonPanel() {
-        var emoticons: List<ExtraEmoticon>;
-        var iconPath: String? = null;
-        init {
+        private var emoticons: List<ExtraEmoticon> = listOf();
+        private var iconPath: String? = null;
+        private val path = path;
+        fun updateEmoticons() {
             val files = listDir(path);
             val emoticons = mutableListOf<ExtraEmoticon>();
             val FavoriteEmoticonInfo = Initiator.loadClass("com.tencent.mobileqq.emoticonview.FavoriteEmoticonInfo");
@@ -72,9 +77,11 @@ class LocalDocumentEmoticonProvider : ExtraEmoticonProvider() {
                 if(!allowedExtensions.contains(filename.substring(filename.lastIndexOf(".")))) continue;
 
                 emoticons.add(object : ExtraEmoticon() {
-                    override fun QQEmoticonObject(): Any {
-                        val info = FavoriteEmoticonInfo.newInstance();
+                    val info = FavoriteEmoticonInfo.newInstance();
+                    init {
                         info.set("path", file);
+                    }
+                    override fun QQEmoticonObject(): Any {
                         return info;
                     }
                 })
@@ -84,26 +91,48 @@ class LocalDocumentEmoticonProvider : ExtraEmoticonProvider() {
                 iconPath = files[0];
             }
         }
+        init {
+            executor.execute {
+                updateEmoticons();
+            }
+        }
+        var lastEmoticonUpdateTime = 0L;
         override fun emoticons(): List<ExtraEmoticon> {
+            if(System.currentTimeMillis() - lastEmoticonUpdateTime > 1000 * 5) {
+                lastEmoticonUpdateTime = System.currentTimeMillis();
+                executor.execute {
+                    updateEmoticons();
+                }
+            }
             return emoticons;
         }
 
-        override fun emoticonPanelIconURL(): String {
-            return if(iconPath != null)  "file://$iconPath" else "";
+        override fun emoticonPanelIconURL(): String? {
+            return if(iconPath != null)  "file://$iconPath" else null;
         }
 
         override fun uniqueId(): String {
             return iconPath ?: "none";
         }
     }
+    val panelsMap = mutableMapOf<String, Panel>();
     override fun extraEmoticonList(): List<ExtraEmoticonPanel> {
         val files = listDir("/storage/emulated/0/Documents/TGStickersExported/v1/");
         val panels = mutableListOf<ExtraEmoticonPanel>()
         for (file in files) {
+            if (panelsMap.containsKey(file)) {
+                panels.add(panelsMap[file]!!);
+                continue;
+            }
             if(file.endsWith(".nomedia")) continue;
             if(!File(file).isDirectory) continue;
-            val panel = Panel(file);
-            panels.add(panel);
+
+            if (!panelsMap.containsKey(file)) {
+                val panel = Panel(file);
+                panelsMap[file] = panel;
+            }
+
+            panels.add(panelsMap[file]!!);
         }
         return panels;
     }
@@ -175,7 +204,10 @@ object DumpTelegramStickers : CommonSwitchFunctionHook() {
                     val panel = provider.extraEmoticonList().find { it.uniqueId() == id.panelId };
                     if(panel != null) {
                         val url = panel.emoticonPanelIconURL();
-                        it.result = java.net.URL(url);
+                        if (url != null)
+                            it.result = java.net.URL(url);
+                        else
+                            it.result = null;
                     }
                 }
             }
@@ -186,6 +218,7 @@ object DumpTelegramStickers : CommonSwitchFunctionHook() {
         HookUtils.hookAfterIfEnabled(this, EmoticonPanelController.method("getPanelDataList")!!) {
             // 移除自带面板
             // TODO: 做成可选
+            if(it.result == null) return@hookAfterIfEnabled;
             val list = it.result as MutableList<Any>;
             val iterator = list.iterator();
 
@@ -252,7 +285,7 @@ object DumpTelegramStickers : CommonSwitchFunctionHook() {
             it.result = list;
         }
         // 面板数据
-        HookUtils.hookBeforeIfEnabled(this, EmotionPanelViewPagerAdapter.method("getEmotionPanelData")!!) {
+        HookUtils.hookBeforeIfEnabled(this, EmotionPanelViewPagerAdapter.method("getEmotionPanelData")?:EmotionPanelViewPagerAdapter.method("queryEmoticonsByPackageIdFromDB")!!) {
             val pkg = it.args[2].get("emotionPkg") ?: return@hookBeforeIfEnabled;
             val epid = pkg.get("epId")?: return@hookBeforeIfEnabled;
             val id = parseQAEpId(epid as String);
@@ -275,5 +308,5 @@ object DumpTelegramStickers : CommonSwitchFunctionHook() {
         return true;
     }
 
-    override val isAvailable = QAppUtils.isQQnt();
+    override val isAvailable: Boolean get() = requireMinQQVersion(QQVersion.QQ_9_0_8)
 }
