@@ -26,10 +26,11 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CLANG_C_EXTRA_OPT} -fPIC -Werror=return-ty
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-allow-shlib-undefined,--no-undefined -Wl,-z,defs,-z,now,-z,relro")
 
 SET_OPTION(DOBBY_GENERATE_SHARED OFF)
-SET_OPTION(Plugin.SymbolResolver ON)
+# Do not use Dobby symbol resolver. You link it once and it crashes everywhere.
+SET_OPTION(Plugin.SymbolResolver OFF)
 add_subdirectory(../../../../libs/Dobby dobby)
 
-# set -fno-omit-frame-pointer for Dobby if ANDROID_ABI is armeabi-v7a
+# set -fomit-frame-pointer for Dobby if ANDROID_ABI is armeabi-v7a
 if ("${ANDROID_ABI}" STREQUAL "armeabi-v7a")
     target_compile_options(dobby PRIVATE -fomit-frame-pointer)
 endif ()
@@ -95,5 +96,5 @@ target_compile_definitions(qauxv PRIVATE QAUXV_VERSION=\"${QAUXV_VERSION}\")
 target_link_options(qauxv PRIVATE "-Wl,-e,__libqauxv_main")
 
 target_link_libraries(qauxv dobby mmkv dexkit_static unwindstack base silk
-        c dl fmt-header-only z lsplant_static absl::flat_hash_map
+        c dl fmt-header-only z lsplant_static
         ${ANDROID_LIBS})
