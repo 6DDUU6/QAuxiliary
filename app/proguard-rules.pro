@@ -18,6 +18,9 @@
 -keep class com.tencent.mmkv.** { *; }
 -keep class com.alphi.qhmk.** { *; }
 -keep class top.linl.** { *; }
+-keep class io.github.moonleeeaf.** { *; }
+-keep class awoo.linwenxuan04.** { *; }
+
 -keepclasseswithmembernames class * {
     native <methods>;
 }
