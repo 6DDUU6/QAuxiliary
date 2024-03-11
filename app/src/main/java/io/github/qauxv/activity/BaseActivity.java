@@ -27,7 +27,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.os.Build.VERSION_CODES;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import androidx.annotation.CallSuper;
@@ -506,7 +506,7 @@ public abstract class BaseActivity extends AppCompatTransferActivity {
         // to implement
     }
 
-    @RequiresApi(api = VERSION_CODES.O)
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onMultiWindowModeChanged(boolean isInMultiWindowMode, Configuration newConfig) {
         super.onMultiWindowModeChanged(isInMultiWindowMode, newConfig);
