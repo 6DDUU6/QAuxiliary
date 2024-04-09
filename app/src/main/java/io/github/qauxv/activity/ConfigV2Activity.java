@@ -29,7 +29,6 @@ import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.LayoutInflater;
@@ -98,8 +97,7 @@ public class ConfigV2Activity extends AppCompatTransferActivity {
             finish();
         }
         HookStatus.init(this);
-        if (getCurrentV2Theme() == 3 && Build.VERSION.SDK_INT >= 24) {
-            // R.drawable.ic_bg_gradient uses theme attributes which only available in API 24+
+        if (getCurrentV2Theme() == 3) {
             // MaiTung light blue
             ViewGroup root = (ViewGroup) LayoutInflater.from(this).inflate(R.layout.main_v2_light_blue, null);
             mainV2Binding = MainV2NormalBinding.bind(root);
