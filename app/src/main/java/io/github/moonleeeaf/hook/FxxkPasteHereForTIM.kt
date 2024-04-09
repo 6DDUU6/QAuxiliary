@@ -20,31 +20,42 @@
  * <https://github.com/cinit/QAuxiliary/blob/master/LICENSE.md>.
  */
 
-package com.xiaoniu.hook
+package io.github.moonleeeaf.hook
 
-import com.github.kyuubiran.ezxhelper.utils.hookReturnConstant
+import cc.hicore.QApp.QAppUtils
+import cc.ioctl.util.HookUtils
+import cc.ioctl.util.Reflex
 import io.github.qauxv.base.annotation.FunctionHookEntry
 import io.github.qauxv.base.annotation.UiItemAgentEntry
 import io.github.qauxv.dsl.FunctionEntryRouter
 import io.github.qauxv.hook.CommonSwitchFunctionHook
-import io.github.qauxv.util.QQVersion
+import io.github.qauxv.util.Initiator
+import io.github.qauxv.util.dexkit.CopyPromptHelper_handlePrompt
 import io.github.qauxv.util.dexkit.DexKit
-import io.github.qauxv.util.dexkit.TroopInfoCardPageABConfig
-import io.github.qauxv.util.requireMinQQVersion
-import xyz.nextalone.util.throwOrTrue
+import xyz.nextalone.util.get
+import xyz.nextalone.util.set
 
+// 参考滞空方法模板: TimRemoveToastTips.kt
 @FunctionHookEntry
 @UiItemAgentEntry
-object DisableNewTroopInfoPage : CommonSwitchFunctionHook(arrayOf(TroopInfoCardPageABConfig)) {
-    override val name = "禁用新版群资料页"
+object FxxkPasteHereForTIM : CommonSwitchFunctionHook(
+    arrayOf(CopyPromptHelper_handlePrompt)
+) {
 
-    override val description = "新版群资料页功能缺失，中看不中用，遂禁用之"
+    override val name = "移除聊天输入框“点击粘贴”"
+    override val description = "仅在 TIM 3.5.1 理论推得，未经测试，参考 Issue #890";
+    override val uiItemLocation = FunctionEntryRouter.Locations.Auxiliary.MESSAGE_CATEGORY
 
-    override val isAvailable = requireMinQQVersion(QQVersion.QQ_8_9_78)
-
-    override fun initOnce() = throwOrTrue {
-        DexKit.requireMethodFromCache(TroopInfoCardPageABConfig).hookReturnConstant(false)
+    override fun initOnce(): Boolean {
+        // 查找字符串参考 https://github.com/cinit/QAuxiliary/issues/890
+        // TIM [x, y], x in (3.0.0, 3.1.0], y unknown
+        // QQ [x, y], x in (8.0.0, 8.1.0], y in [9.0.8.14755_5540, QQ_9.0.15.14880_5590)
+        HookUtils.hookBeforeIfEnabled(
+            this, DexKit.requireMethodFromCache(CopyPromptHelper_handlePrompt)
+        ) {
+            it.result = null;
+        }
+        return true;
     }
 
-    override val uiItemLocation = FunctionEntryRouter.Locations.Auxiliary.GROUP_CATEGORY
 }
