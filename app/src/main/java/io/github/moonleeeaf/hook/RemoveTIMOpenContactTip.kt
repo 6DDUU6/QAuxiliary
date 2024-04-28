@@ -35,24 +35,21 @@ import io.github.qauxv.util.dexkit.DexKit
 import xyz.nextalone.util.get
 import xyz.nextalone.util.set
 
-// 参考滞空方法模板: TimRemoveToastTips.kt
+// 模板: TimRemoveToastTips.kt
 @FunctionHookEntry
 @UiItemAgentEntry
-object FxxkPasteHereForTIM : CommonSwitchFunctionHook(
-    arrayOf(CopyPromptHelper_handlePrompt)
-) {
+object RemoveTIMOpenContactTip : CommonSwitchFunctionHook() {
 
-    override val name = "移除聊天输入框“点击粘贴”"
-    override val description = "仅在 TIM 3.5.1 测试通过";
-    override val uiItemLocation = FunctionEntryRouter.Locations.Auxiliary.MESSAGE_CATEGORY
+    override val name = "禁止提示打开通讯录"
+    override val description = "未经测试，根据 TIM 3.5.1 代码编写";
+    override val uiItemLocation = FunctionEntryRouter.Locations.Simplify.MAIN_UI_CONTACT
 
     override fun initOnce(): Boolean {
-        // 查找字符串参考 https://github.com/cinit/QAuxiliary/issues/890
-        // TIM [x, y], x in (3.0.0, 3.1.0], y unknown
-        // QQ [x, y], x in (8.0.0, 8.1.0], y in [9.0.8.14755_5540, QQ_9.0.15.14880_5590)
-        HookUtils.hookBeforeIfEnabled(
-            this, DexKit.requireMethodFromCache(CopyPromptHelper_handlePrompt)
-        ) {
+        // 字符串ID 7f0f4c88
+        // 最终找到 aejy 方法名 migrateOldOrDefaultContent
+        // 目前该字符串搜出的方法最终调用都在这
+
+        HookUtils.hookBeforeIfEnabled(this, Reflex.findMethod(Initiator.loadClass("aejy"), "migrateOldOrDefaultContent")) {
             it.result = null;
         }
         return true;
