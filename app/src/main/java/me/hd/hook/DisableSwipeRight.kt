@@ -22,9 +22,9 @@
 
 package me.hd.hook
 
-import android.view.View
-import android.widget.TextView
-import cc.ioctl.util.hookAfterIfEnabled
+import cc.ioctl.util.hookBeforeIfEnabled
+import de.robv.android.xposed.XC_MethodHook
+import de.robv.android.xposed.XposedBridge
 import io.github.qauxv.base.annotation.FunctionHookEntry
 import io.github.qauxv.base.annotation.UiItemAgentEntry
 import io.github.qauxv.dsl.FunctionEntryRouter
@@ -36,31 +36,32 @@ import xyz.nextalone.util.isPrivate
 
 @FunctionHookEntry
 @UiItemAgentEntry
-object HideClockInTip : CommonSwitchFunctionHook() {
+object DisableSwipeRight : CommonSwitchFunctionHook() {
 
-    override val name = "隐藏打卡消息"
-    override val description = "对提示消息中的打卡消息进行简单隐藏"
-    override val uiItemLocation = FunctionEntryRouter.Locations.Simplify.CHAT_GROUP_OTHER
+    override val name = "屏蔽聊天右滑"
+    override val description = "屏蔽聊天右滑显示界面[群聊|群应用][好友|亲密关系]"
+    override val uiItemLocation = FunctionEntryRouter.Locations.Simplify.CHAT_OTHER
     override val isAvailable = requireMinQQVersion(QQVersion.QQ_8_9_88)
 
     override fun initOnce(): Boolean {
         /**
          * version 8.9.88(4852)
          *
-         * class [ com/tencent/mobileqq/aio/msglist/holder/component/graptips/common/CommonGrayTipsComponent ]
+         * class [ com/tencent/aio/frame/drawer/DrawerFrameViewGroup ]
          *
-         * method [ private final t1()Lcom/tencent/mobileqq/aio/msglist/holder/component/graptips/GrayTipsTextView; ]
+         * method [ private final v(I)V ]
+         *
+         * keyword [ scrollFrame scrollPercent ]
          */
-        val tipsClass = Initiator.loadClass("com.tencent.mobileqq.aio.msglist.holder.component.graptips.common.CommonGrayTipsComponent")
-        val tipsTextViewClass = Initiator.loadClass("com.tencent.mobileqq.aio.msglist.holder.component.graptips.GrayTipsTextView")
-        val getTextViewMethod = tipsClass.declaredMethods.single { method ->
-            method.isPrivate && method.returnType == tipsTextViewClass
+        val drawerFrameClass = Initiator.loadClass("com.tencent.aio.frame.drawer.DrawerFrameViewGroup")
+        val scrollMethod = drawerFrameClass.declaredMethods.single { method ->
+            val params = method.parameterTypes
+            method.isPrivate && params.size == 1 && params[0] == Int::class.java
         }
-        hookAfterIfEnabled(getTextViewMethod) { param ->
-            val textView = param.result as TextView
-            val text = textView.text.toString()
-            if (text.endsWith("我也要打卡")) {
-                textView.visibility = View.GONE
+        hookBeforeIfEnabled(scrollMethod) { param ->
+            val scrollX = param.args[0] as Int
+            if (scrollX > 0) {
+                param.args[0] = 0
             }
         }
         return true

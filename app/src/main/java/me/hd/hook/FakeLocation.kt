@@ -22,9 +22,7 @@
 
 package me.hd.hook
 
-import android.view.View
-import android.widget.TextView
-import cc.ioctl.util.hookAfterIfEnabled
+import cc.ioctl.util.hookBeforeIfEnabled
 import io.github.qauxv.base.annotation.FunctionHookEntry
 import io.github.qauxv.base.annotation.UiItemAgentEntry
 import io.github.qauxv.dsl.FunctionEntryRouter
@@ -32,35 +30,27 @@ import io.github.qauxv.hook.CommonSwitchFunctionHook
 import io.github.qauxv.util.Initiator
 import io.github.qauxv.util.QQVersion
 import io.github.qauxv.util.requireMinQQVersion
-import xyz.nextalone.util.isPrivate
 
 @FunctionHookEntry
 @UiItemAgentEntry
-object HideClockInTip : CommonSwitchFunctionHook() {
+object FakeLocation : CommonSwitchFunctionHook() {
 
-    override val name = "隐藏打卡消息"
-    override val description = "对提示消息中的打卡消息进行简单隐藏"
-    override val uiItemLocation = FunctionEntryRouter.Locations.Simplify.CHAT_GROUP_OTHER
+    override val name = "虚拟共享位置"
+    override val description = "虚拟群聊内共享位置定位内容"
+    override val uiItemLocation = FunctionEntryRouter.Locations.Entertainment.ENTERTAIN_CATEGORY
     override val isAvailable = requireMinQQVersion(QQVersion.QQ_8_9_88)
 
     override fun initOnce(): Boolean {
-        /**
-         * version 8.9.88(4852)
-         *
-         * class [ com/tencent/mobileqq/aio/msglist/holder/component/graptips/common/CommonGrayTipsComponent ]
-         *
-         * method [ private final t1()Lcom/tencent/mobileqq/aio/msglist/holder/component/graptips/GrayTipsTextView; ]
-         */
-        val tipsClass = Initiator.loadClass("com.tencent.mobileqq.aio.msglist.holder.component.graptips.common.CommonGrayTipsComponent")
-        val tipsTextViewClass = Initiator.loadClass("com.tencent.mobileqq.aio.msglist.holder.component.graptips.GrayTipsTextView")
-        val getTextViewMethod = tipsClass.declaredMethods.single { method ->
-            method.isPrivate && method.returnType == tipsTextViewClass
-        }
-        hookAfterIfEnabled(getTextViewMethod) { param ->
-            val textView = param.result as TextView
-            val text = textView.text.toString()
-            if (text.endsWith("我也要打卡")) {
-                textView.visibility = View.GONE
+        val locationManagerClass = Initiator.loadClass("com.tencent.mobileqq.location.net.LocationShareLocationManager\$a")
+        val locationInterfaceClass = Initiator.loadClass("com.tencent.map.geolocation.TencentLocation")
+        val onChangedMethod = locationManagerClass.getDeclaredMethod("onLocationChanged", locationInterfaceClass, Int::class.java, String::class.java)
+        hookBeforeIfEnabled(onChangedMethod) { param ->
+            val locationClass = param.args[0]::class.java
+            hookBeforeIfEnabled(locationClass.getDeclaredMethod("getLatitude")) { paramLatitude ->
+                paramLatitude.result = 39.90307
+            }
+            hookBeforeIfEnabled(locationClass.getDeclaredMethod("getLongitude")) { paramLongitude ->
+                paramLongitude.result = 116.39773
             }
         }
         return true
