@@ -27,27 +27,30 @@ import io.github.qauxv.base.annotation.FunctionHookEntry
 import io.github.qauxv.base.annotation.UiItemAgentEntry
 import io.github.qauxv.dsl.FunctionEntryRouter
 import io.github.qauxv.hook.CommonSwitchFunctionHook
-import io.github.qauxv.util.Initiator
 import io.github.qauxv.util.QQVersion
+import io.github.qauxv.util.dexkit.DexKit
+import io.github.qauxv.util.dexkit.Hd_RemoveRedPackSkin_Class
 import io.github.qauxv.util.requireMinQQVersion
-import xyz.nextalone.util.isPublic
 
 @FunctionHookEntry
 @UiItemAgentEntry
-object RemoveSelectedMedia : CommonSwitchFunctionHook() {
+object RemoveRedPackSkin : CommonSwitchFunctionHook(
+    targets = arrayOf(Hd_RemoveRedPackSkin_Class)
+) {
 
-    override val name = "移除选择媒体限制"
-    override val description = "移除最多只能选择20张图片/视频限制"
-    override val uiItemLocation = FunctionEntryRouter.Locations.Auxiliary.CHAT_CATEGORY
+    override val name = "移除红包封皮"
+    override val description = "移除群聊红包列表中的红包封皮"
+    override val uiItemLocation = FunctionEntryRouter.Locations.Simplify.CHAT_GROUP_OTHER
     override val isAvailable = requireMinQQVersion(QQVersion.QQ_8_9_88)
 
     override fun initOnce(): Boolean {
-        val selectedMediaVMClass = Initiator.loadClass("com.tencent.qqnt.qbasealbum.select.viewmodel.SelectedMediaViewModel")
-        val ifNumMethod = selectedMediaVMClass.declaredMethods.single { method ->
-            method.isPublic && method.parameterTypes.isEmpty() && method.returnType == Boolean::class.java
+        val panelClass = DexKit.requireClassFromCache(Hd_RemoveRedPackSkin_Class)
+        val addListMethod = panelClass.declaredMethods.single { method ->
+            val params = method.parameterTypes
+            params.size == 2 && params[0] == Int::class.java && params[1] == List::class.java
         }
-        hookBeforeIfEnabled(ifNumMethod) { param ->
-            param.result = true
+        hookBeforeIfEnabled(addListMethod) { param ->
+            param.args[1] = emptyList<Any>()
         }
         return true
     }
