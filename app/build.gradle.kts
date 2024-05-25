@@ -227,6 +227,8 @@ dependencies {
     implementation(libs.material.dialogs.core)
     implementation(libs.material.dialogs.input)
     implementation(libs.ezXHelper)
+    implementation(libs.okhttp)
+    implementation(libs.gson)
     // festival title
     implementation(libs.confetti)
     implementation(libs.weatherView)

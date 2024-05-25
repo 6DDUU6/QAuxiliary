@@ -60,20 +60,20 @@ fun dumpIntent(intent: Intent) {
 
 fun checkCardMsg(originString: String): CardMsgCheckResult {
     try {
-        Log.d("origin string: $originString")
-        val string = decodePercent(originString)
-        Log.d("decode string: $string")
-        val blackListString = CardMsgList.getInstance().invoke()
-        val blackList = blackListString.decodeToDataClass<Map<String, String>>()
-        for (rule in blackList) {
-            if (Regex(
-                    rule.value,
-                    setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL)
-                ).containsMatchIn(string)
-            ) {
-                return CardMsgCheckResult(false, rule.key)
-            }
-        }
+//        Log.d("origin string: $originString")
+//        val string = decodePercent(originString)
+//        Log.d("decode string: $string")
+//        val blackListString = CardMsgList.getInstance().invoke()
+//        val blackList = blackListString.decodeToDataClass<Map<String, String>>()
+//        for (rule in blackList) {
+//            if (Regex(
+//                    rule.value,
+//                    setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL)
+//                ).containsMatchIn(string)
+//            ) {
+//                return CardMsgCheckResult(false, rule.key)
+//            }
+//        }
         return CardMsgCheckResult(true)
     } catch (e: Exception) {
         Log.e(e)

@@ -676,6 +676,20 @@ data object PaiYiPaiHandler_canSendReq : DexKitTarget.UsingStr() {
     override val filter = DexKitFilter.allowAll
 }
 
+data object EmoticonHandler_handleSmallEmotion : DexKitTarget.UsingStr() {
+    override val findMethod: Boolean = true
+    override val declaringClass = "com/tencent/mobileqq/app/EmoticonHandler"
+    override val traitString = arrayOf("TYPE_EMOSM_PS_FETCH: small emotion")
+    override val filter = DexKitFilter.allowAll
+}
+
+data object GrayCheckHandler_Check : DexKitTarget.UsingStr() {
+    override val findMethod: Boolean = true
+    override val declaringClass = "com/tencent/mobileqq/graycheck/business/GrayCheckHandler"
+    override val traitString = arrayOf("GrayUinCheckResp is null")
+    override val filter = DexKitFilter.allowAll
+}
+
 data object TroopGuildChatPie_flingRToL : DexKitTarget.UsingStr() {
     override val findMethod: Boolean = true
     override val declaringClass = "com.tencent.mobileqq.troop.guild.TroopGuildChatPie"
@@ -951,4 +965,18 @@ data object PlusPanel_PanelAdapter : DexKitTarget.UsingStr() {
     override val traitString: Array<String> = arrayOf("appDataLists.subList(startIndex, endIndex)")
     override val declaringClass = ""
     override val filter: dexkitFilter = DexKitFilter.allowAll
+}
+
+data object Hd_FakePhone_Method : DexKitTarget.UsingStringVector() {
+    override val findMethod = true
+    override val traitStringVectors = arrayOf(arrayOf("status", "wording", "target_desc", "target_name"))
+    override val declaringClass = ""
+    override val filter = DexKitFilter.strInClsName("com/tencent/mobileqq/app/")
+}
+
+data object Hd_RemoveRedPackSkin_Class : DexKitTarget.UsingStr() {
+    override val findMethod = false
+    override val traitString = arrayOf("红包封皮")
+    override val declaringClass = ""
+    override val filter = DexKitFilter.strInClsName("com/tencent/mobileqq/qwallet/hb/panel/")
 }

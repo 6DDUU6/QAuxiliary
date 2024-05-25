@@ -27,6 +27,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+import cc.ioctl.hook.PacketHook;
+import cc.ioctl.hook.SettingMcEntryHook;
 import android.system.Os;
 import android.system.StructUtsname;
 import androidx.annotation.Nullable;
@@ -152,6 +154,7 @@ public class MainHook {
                         Object dir = getStartDirector(param.thisObject);
                         if (safeMode) {
                             SettingEntryHook.INSTANCE.initialize();
+                            SettingMcEntryHook.INSTANCE.initialize();
                         } else {
                             InjectDelayableHooks.step(dir);
                         }
@@ -172,6 +175,7 @@ public class MainHook {
                 InjectDelayableHooks.step(dir);
             }
         }
+        PacketHook.INSTANCE.checkAndInit(ctx);
     }
 
     private static boolean isForegroundStartupForMainProcess(Context ctx, Object step) {
