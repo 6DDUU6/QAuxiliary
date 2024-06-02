@@ -23,7 +23,7 @@
 package me.hd.hook
 
 import android.view.ViewGroup
-import android.widget.TextView
+import android.widget.EditText
 import cc.ioctl.util.hookAfterIfEnabled
 import io.github.qauxv.base.annotation.FunctionHookEntry
 import io.github.qauxv.base.annotation.UiItemAgentEntry
@@ -32,36 +32,22 @@ import io.github.qauxv.hook.CommonSwitchFunctionHook
 import io.github.qauxv.util.Initiator
 import io.github.qauxv.util.QQVersion
 import io.github.qauxv.util.requireMinQQVersion
-import xyz.nextalone.util.isPrivate
 
 @FunctionHookEntry
 @UiItemAgentEntry
-object HideClockInTip : CommonSwitchFunctionHook() {
+object HideEditTroopNick : CommonSwitchFunctionHook() {
 
-    override val name = "隐藏打卡消息"
-    override val description = "对群聊中每日打卡消息进行简单隐藏"
+    override val name = "隐藏编辑群昵称装扮"
+    override val description = "对编辑群昵称界面的装扮布局进行简单隐藏"
     override val uiItemLocation = FunctionEntryRouter.Locations.Simplify.CHAT_GROUP_OTHER
     override val isAvailable = requireMinQQVersion(QQVersion.QQ_8_9_88)
 
     override fun initOnce(): Boolean {
-        val tipsClass = Initiator.loadClass("com.tencent.mobileqq.aio.msglist.holder.component.graptips.common.CommonGrayTipsComponent")
-        val textViewClass = if (requireMinQQVersion(QQVersion.QQ_9_0_8)) {
-            Initiator.loadClass("com.tencent.qqnt.aio.widget.AIOMsgTextView")
-        } else if (requireMinQQVersion(QQVersion.QQ_8_9_88)) {
-            Initiator.loadClass("com.tencent.mobileqq.aio.msglist.holder.component.graptips.GrayTipsTextView")
-        } else {
-            return false
-        }
-        val getTextViewMethod = tipsClass.declaredMethods.single { method ->
-            method.isPrivate && method.returnType == textViewClass
-        }
-        hookAfterIfEnabled(getTextViewMethod) { param ->
-            val textView = param.result as TextView
-            val text = textView.text.toString()
-            if (text.endsWith("我也要打卡")) {
-                val parent = textView.parent.parent as ViewGroup
-                parent.layoutParams = ViewGroup.LayoutParams(0, 0)
-            }
+        val editTroopNickClass = Initiator.loadClass("com.tencent.mobileqq.activity.editservice.EditTroopMemberNickService")
+        val initUiMethod = editTroopNickClass.getDeclaredMethod("c", ViewGroup::class.java, EditText::class.java, ViewGroup::class.java)
+        hookAfterIfEnabled(initUiMethod) { param ->
+            val view = param.args[2] as ViewGroup
+            view.visibility = ViewGroup.GONE
         }
         return true
     }
