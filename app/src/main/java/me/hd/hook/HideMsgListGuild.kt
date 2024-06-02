@@ -23,8 +23,9 @@
 package me.hd.hook
 
 import android.view.ViewGroup
-import android.widget.TextView
-import cc.ioctl.util.hookAfterIfEnabled
+import android.widget.RelativeLayout
+import de.robv.android.xposed.XC_MethodHook
+import de.robv.android.xposed.XposedBridge
 import io.github.qauxv.base.annotation.FunctionHookEntry
 import io.github.qauxv.base.annotation.UiItemAgentEntry
 import io.github.qauxv.dsl.FunctionEntryRouter
@@ -32,31 +33,29 @@ import io.github.qauxv.hook.CommonSwitchFunctionHook
 import io.github.qauxv.util.Initiator
 import io.github.qauxv.util.QQVersion
 import io.github.qauxv.util.requireMinQQVersion
-import xyz.nextalone.util.isPrivate
 
 @FunctionHookEntry
 @UiItemAgentEntry
-object HideClockInTip : CommonSwitchFunctionHook() {
+object HideMsgListGuild : CommonSwitchFunctionHook() {
 
-    override val name = "隐藏打卡消息"
-    override val description = "对群聊中每日打卡消息进行简单隐藏"
+    override val name = "隐藏消息列表的QQ频道"
+    override val description = "对消息列表中的QQ频道进行简单隐藏"
     override val uiItemLocation = FunctionEntryRouter.Locations.Simplify.CHAT_GROUP_OTHER
     override val isAvailable = requireMinQQVersion(QQVersion.QQ_8_9_88)
 
     override fun initOnce(): Boolean {
-        val tipsClass = Initiator.loadClass("com.tencent.mobileqq.aio.msglist.holder.component.graptips.common.CommonGrayTipsComponent")
-        val tipsTextViewClass = Initiator.loadClass("com.tencent.mobileqq.aio.msglist.holder.component.graptips.GrayTipsTextView")
-        val getTextViewMethod = tipsClass.declaredMethods.single { method ->
-            method.isPrivate && method.returnType == tipsTextViewClass
-        }
-        hookAfterIfEnabled(getTextViewMethod) { param ->
-            val textView = param.result as TextView
-            val text = textView.text.toString()
-            if (text.endsWith("我也要打卡")) {
-                val parent = textView.parent.parent as ViewGroup
-                parent.layoutParams = ViewGroup.LayoutParams(0, 0)
+        val bindingClass = Initiator.loadClass("com.tencent.qqnt.chats.f.a.e")
+        XposedBridge.hookAllConstructors(
+            bindingClass,
+            object : XC_MethodHook() {
+                override fun afterHookedMethod(param: MethodHookParam) {
+                    val field = bindingClass.declaredFields.single { field -> field.type == RelativeLayout::class.java }
+                    val relativeLayout = field.get(param.thisObject) as RelativeLayout
+                    val parent = relativeLayout.parent as ViewGroup
+                    parent.layoutParams = ViewGroup.LayoutParams(0, 0)
+                }
             }
-        }
+        )
         return true
     }
 }
