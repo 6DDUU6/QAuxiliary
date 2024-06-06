@@ -23,6 +23,7 @@
 package me.hd.hook
 
 import cc.ioctl.util.hookBeforeIfEnabled
+import de.robv.android.xposed.XposedHelpers
 import io.github.qauxv.base.annotation.FunctionHookEntry
 import io.github.qauxv.base.annotation.UiItemAgentEntry
 import io.github.qauxv.dsl.FunctionEntryRouter
@@ -33,22 +34,24 @@ import io.github.qauxv.util.requireMinQQVersion
 
 @FunctionHookEntry
 @UiItemAgentEntry
-object ChangeCircleJumpProfile : CommonSwitchFunctionHook() {
+object RemoveGroupProfileDialog : CommonSwitchFunctionHook() {
 
-    override val name = "更改小世界跳转资料"
-    override val description = "忽略作者设置了QQ资料卡不可见,点击头像强制跳转"
-    override val uiItemLocation = FunctionEntryRouter.Locations.Auxiliary.MISC_CATEGORY
+    override val name = "移除群成员资料卡弹窗"
+    override val description = "忽略账号异常状态, 使其可以正常查看"
+    override val uiItemLocation = FunctionEntryRouter.Locations.Auxiliary.PROFILE_CATEGORY
     override val isAvailable = requireMinQQVersion(QQVersion.QQ_8_9_88)
 
     override fun initOnce(): Boolean {
-        val circleClass = Initiator.loadClass("com.tencent.biz.qqcircle.QCirclePluginUtil")
-        val canJumpMethod = circleClass.getDeclaredMethod("canJumpToQQProfile", List::class.java)
-        hookBeforeIfEnabled(canJumpMethod) { param ->
-            param.result = true
-        }
-        val isBeatedMethod = circleClass.getDeclaredMethod("isJumpToQQProfileBeated", List::class.java)
-        hookBeforeIfEnabled(isBeatedMethod) { param ->
-            param.result = false
+        val profileSecureClass = Initiator.loadClass("com.tencent.mobileqq.profilecard.processor.ProfileSecureProcessor")
+        val respHeadClass = Initiator.loadClass("SummaryCard.RespHead")
+        val respSummaryCardClass = Initiator.loadClass("SummaryCard.RespSummaryCard")
+        val profileCardMethod = profileSecureClass.getDeclaredMethod("processProfileCard", respHeadClass, respSummaryCardClass)
+        hookBeforeIfEnabled(profileCardMethod) { param ->
+            val respHead = param.args[0]
+            val iResult = XposedHelpers.getObjectField(respHead, "iResult")
+            if (iResult == 201 || iResult == 202) {
+                XposedHelpers.setObjectField(respHead, "iResult", 0)
+            }
         }
         return true
     }
