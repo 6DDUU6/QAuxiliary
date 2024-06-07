@@ -990,7 +990,7 @@ data object Hd_RemoveRedPackSkin_Class : DexKitTarget.UsingStr() {
 
 data object Hd_HandleQQSomeFunExit_fixFileView_Method : DexKitTarget.UsingStr() {
     override val findMethod = true
-    override val traitString = arrayOf("formatFileSizeNotSync(fileElement.fileSize)")
+    override val traitString = arrayOf("(fileElement.fileSize)")
     override val declaringClass = "Lcom/tencent/mobileqq/aio/msglist/holder/component/file/AIOFileViewer"
     override val filter = DexKitFilter.allowAll
 }
