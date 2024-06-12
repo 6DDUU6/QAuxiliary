@@ -34,6 +34,7 @@ import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 
 import io.github.qauxv.util.McHookStatus;
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Random;
@@ -355,6 +356,28 @@ public class PacketHook {
         XposedBridge.hookAllMethods(clazz, "setAccountKey", setAccountKey);
     }
 
+    private void hookNTPacket(Class<?> clazz) {
+        XC_MethodHook onReceData = new XC_MethodHook() {
+            // 执行方法之后执行的方法
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                if (!isInit) {
+                    hookReceivePacketNew(param.thisObject.getClass());
+                    isInit = true;
+                }
+            }
+        };
+        XC_MethodHook encodeRequest = new XC_MethodHook() {
+            // 执行方法之后执行的方法
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                hookSendPacketNew(param);
+            }
+        };
+
+        XposedBridge.hookAllMethods(clazz, "onMSFPacketState", onReceData);
+        XposedBridge.hookAllMethods(clazz, "sendPacket", encodeRequest);
+    }
 
     private void hookSendPacket(XC_MethodHook.MethodHookParam param) {
         if (McHookStatus.getOpenStatus() == 0) {
@@ -402,6 +425,50 @@ public class PacketHook {
             }
         };
         XposedBridge.hookAllMethods(clazz, "onResponse", xcMethodHook);
+    }
+
+    private void hookSendPacketNew(XC_MethodHook.MethodHookParam param) throws NoSuchFieldException, IllegalAccessException {
+        if (McHookStatus.getOpenStatus() == 0) {
+            return;
+        }
+        Object from = param.args[0];
+        if (from.getClass().getName().equals("com.tencent.mobileqq.msfcore.MSFRequestAdapter")) {
+            Field cmdField = from.getClass().getDeclaredField("mCmd");
+            if (!cmdField.isAccessible()) cmdField.setAccessible(true);
+            String command = (String) cmdField.get(from);
+            Field uinField = from.getClass().getDeclaredField("mUin");
+            if (!uinField.isAccessible()) uinField.setAccessible(true);
+            String uin = (String) uinField.get(from);
+            Field seqField = from.getClass().getDeclaredField("mSeq");
+            if (!seqField.isAccessible()) seqField.setAccessible(true);
+            Integer seq = (Integer) seqField.get(from);
+            Field dataField = from.getClass().getDeclaredField("mData");
+            if (!dataField.isAccessible()) dataField.setAccessible(true);
+            byte[] buffer = (byte[]) dataField.get(from);
+            saveRequest(seq, command, uin, buffer);
+        }
+    }
+
+    private void hookReceivePacketNew(XC_MethodHook.MethodHookParam param) throws NoSuchFieldException, IllegalAccessException {
+        if (McHookStatus.getOpenStatus() == 0) {
+            return;
+        }
+        Object from = param.args[0];
+        if (from.getClass().getName().equals("com.tencent.mobileqq.msfcore.MSFResponseAdapter")) {
+            Field cmdField = from.getClass().getDeclaredField("mCmd");
+            if (!cmdField.isAccessible()) cmdField.setAccessible(true);
+            String command = (String) cmdField.get(from);
+            Field uinField = from.getClass().getDeclaredField("mUin");
+            if (!uinField.isAccessible()) uinField.setAccessible(true);
+            String uin = (String) uinField.get(from);
+            Field seqField = from.getClass().getDeclaredField("mSeq");
+            if (!seqField.isAccessible()) seqField.setAccessible(true);
+            Integer seq = (Integer) seqField.get(from);
+            Field dataField = from.getClass().getDeclaredField("mRecvData");
+            if (!dataField.isAccessible()) dataField.setAccessible(true);
+            byte[] buffer = (byte[]) dataField.get(from);
+            saveReceive(seq, command, uin, buffer);
+        }
     }
 
     private void saveRequest(Integer seq, String command, String uin, byte[] buffer) {
@@ -566,38 +633,50 @@ public class PacketHook {
             Class clz = load("com.tencent.qphone.base.util.CodecWarpper");
             if (clz == null) {
                 log("McHookTool: CodecWarpper isnull");
+            } else {
+                hookFirst(clz);
             }
-            hookFirst(clz);
             Class clz2 = load("oicq.wlogin_sdk.tools.EcdhCrypt");
             if (clz2 == null) {
                 log("McHookTool: EcdhCrypt isnull");
+            } else {
+                hookECDHKey(clz2);
             }
-            hookECDHKey(clz2);
             Class clz3 = load("oicq.wlogin_sdk.tools.cryptor");
             if (clz3 == null) {
                 log("McHookTool: cryptor isnull");
+            } else {
+                hookCryptData(clz3);
             }
-            hookCryptData(clz3);
             Class clz4 = load("oicq.wlogin_sdk.request.WloginAllSigInfo");
             if (clz4 == null) {
                 log("McHookTool: WloginAllSigInfo isnull");
+            } else {
+                hookSessionKey(clz4);
             }
-            hookSessionKey(clz4);
             Class clz5 = load("oicq.wlogin_sdk.tools.MD5");
             if (clz5 == null) {
                 log("McHookTool: MD5 isnull");
+            } else {
+                hookMd5(clz5);
             }
-            hookMd5(clz5);
             Class clz6 = load("oicq.wlogin_sdk.tlv_type.tlv_t145");
             if (clz6 == null) {
                 log("McHookTool: tlv_t145 isnull");
+            } else {
+                hookT145(clz6);
             }
-            hookT145(clz6);
 //            Class clz7 = load("oicq.wlogin_sdk.tools.util");
 //            if (clz7 == null) {
 //                log("McHookTool: util isnull");
 //            }
 //            hookGuid(clz7);
+            Class clz8 = load("com.tencent.mobileqq.msfcore.MSFKernel");
+            if (clz8 == null) {
+                log("McHookTool: MSFKernel isnull");
+            } else {
+                hookNTPacket(clz8);
+            }
             return true;
         } catch (Throwable e) {
             log(e);

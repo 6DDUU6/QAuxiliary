@@ -321,7 +321,7 @@ public class SettingMcEntryHook extends BasePersistBackgroundHook {
         editText.setTextSize(16f);
         int _5 = LayoutHelper.dip2px(activity, 5f);
         editText.setPadding(_5, _5, _5, _5 * 2);
-        String address = McHookStatus.getServerUrl("http://192.168.10:103:8888");
+        String address = McHookStatus.getServerUrl("http://192.168.10.190:8888");
         editText.setText(address);
         EditText editTextGuid = new EditText(ctx);
         editTextGuid.setTextSize(16f);
