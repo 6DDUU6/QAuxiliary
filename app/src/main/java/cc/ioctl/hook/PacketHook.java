@@ -362,7 +362,7 @@ public class PacketHook {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 if (!isInit) {
-                    hookReceivePacketNew(param.thisObject.getClass());
+                    hookReceivePacketNew(param);
                     isInit = true;
                 }
             }
