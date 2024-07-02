@@ -31,28 +31,37 @@ import io.github.qauxv.dsl.FunctionEntryRouter
 import io.github.qauxv.hook.CommonSwitchFunctionHook
 import io.github.qauxv.util.Initiator
 import io.github.qauxv.util.QQVersion
+import io.github.qauxv.util.SyncUtils
 import io.github.qauxv.util.requireMinQQVersion
 
 @FunctionHookEntry
 @UiItemAgentEntry
-object RemoveEmoReplyMenu : CommonSwitchFunctionHook() {
+object RemoveDialogWaitTime : CommonSwitchFunctionHook(
+    targetProc = SyncUtils.PROC_ANY
+) {
 
-    override val name = "移除消息表态"
-    override val description = "移除消息菜单中的表情回应"
-    override val uiItemLocation = FunctionEntryRouter.Locations.Simplify.UI_CHAT_MSG
-    override val isAvailable = requireMinQQVersion(QQVersion.QQ_9_0_8)
+    override val name = "移除弹窗等待时间"
+    override val description = "移除弹窗中, 继续按钮的5s, 10s等待时间"
+    override val uiItemLocation = FunctionEntryRouter.Locations.Simplify.UI_MISC
+    override val isAvailable = requireMinQQVersion(QQVersion.QQ_8_9_88)
 
     override fun initOnce(): Boolean {
-        val emoReplyMenuApiImplClass = Initiator.loadClass("com.tencent.qqnt.aio.api.impl.AIOEmoReplyMenuApiImpl")
-        val getEmoReplyMenuViewMethod = emoReplyMenuApiImplClass.getDeclaredMethod(
-            "getEmoReplyMenuView",
+        val dialogUtilClass = Initiator.loadClass("com.tencent.mobileqq.utils.DialogUtil")
+        val getEmoReplyMenuViewMethod = dialogUtilClass.getDeclaredMethod(
+            "createCountdownDialog",
             Context::class.java,
-            Initiator.loadClass("com.tencent.mobileqq.aio.msg.AIOMsgItem"),
-            Object::class.java,
+            String::class.java,
+            CharSequence::class.java,
+            String::class.java,
+            String::class.java,
+            Boolean::class.java,
+            Int::class.java,
+            Int::class.java,
+            View.OnClickListener::class.java,
             View.OnClickListener::class.java
         )
         hookBeforeIfEnabled(getEmoReplyMenuViewMethod) { param ->
-            param.result = null
+            param.args[6] = 0
         }
         return true
     }
