@@ -22,8 +22,9 @@
 
 package me.hd.hook
 
+import android.content.Context
+import android.view.View.OnClickListener
 import cc.ioctl.util.hookBeforeIfEnabled
-import com.tencent.qqnt.kernel.nativeinterface.MsgElement
 import io.github.qauxv.base.annotation.FunctionHookEntry
 import io.github.qauxv.base.annotation.UiItemAgentEntry
 import io.github.qauxv.dsl.FunctionEntryRouter
@@ -31,32 +32,27 @@ import io.github.qauxv.hook.CommonSwitchFunctionHook
 import io.github.qauxv.util.Initiator
 import io.github.qauxv.util.QQVersion
 import io.github.qauxv.util.requireMinQQVersion
-import xyz.nextalone.util.method
 
 @FunctionHookEntry
 @UiItemAgentEntry
-object ChangePicVideoSize : CommonSwitchFunctionHook() {
+object RemoveEmoReplyMenu : CommonSwitchFunctionHook() {
 
-    override val name = "篡改[图片/视频]比例"
-    override val description = "使发送的[图片/视频]在群聊中显示的非常小"
-    override val uiItemLocation = FunctionEntryRouter.Locations.Entertainment.ENTERTAIN_CATEGORY
-    override val isAvailable = requireMinQQVersion(QQVersion.QQ_8_9_88)
+    override val name = "移除消息表态"
+    override val description = "移除消息菜单中的表情回应"
+    override val uiItemLocation = FunctionEntryRouter.Locations.Simplify.UI_CHAT_MSG
+    override val isAvailable = requireMinQQVersion(QQVersion.QQ_9_0_8)
 
     override fun initOnce(): Boolean {
-        val msgServiceClass = Initiator.loadClass("com.tencent.qqnt.kernel.nativeinterface.IKernelMsgService\$CppProxy")
-        hookBeforeIfEnabled(msgServiceClass.method("sendMsg")!!) { param ->
-            val elements = param.args[2] as ArrayList<*>
-            for (element in elements) {
-                val msgElement = (element as MsgElement)
-                msgElement.picElement?.apply {
-                    picWidth = -1
-                    picHeight = -1
-                }
-                msgElement.videoElement?.apply {
-                    thumbWidth = -1
-                    thumbHeight = -1
-                }
-            }
+        val emoReplyMenuApiImplClass = Initiator.loadClass("com.tencent.qqnt.aio.api.impl.AIOEmoReplyMenuApiImpl")
+        val getEmoReplyMenuViewMethod = emoReplyMenuApiImplClass.getDeclaredMethod(
+            "getEmoReplyMenuView",
+            Context::class.java,
+            Initiator.loadClass("com.tencent.mobileqq.aio.msg.AIOMsgItem"),
+            Object::class.java,
+            OnClickListener::class.java
+        )
+        hookBeforeIfEnabled(getEmoReplyMenuViewMethod) { param ->
+            param.result = null
         }
         return true
     }
