@@ -36,8 +36,10 @@ import io.github.duzhaokun123.hook.MessageTTSHook
 import io.github.qauxv.base.annotation.FunctionHookEntry
 import io.github.qauxv.hook.BasePersistBackgroundHook
 import io.github.qauxv.util.Initiator
-import me.hd.hook.CopyMarkdown
+import me.hd.hook.menu.CopyMarkdown
+import me.hd.hook.menu.EditTextContent
 import me.ketal.hook.PicCopyToClipboard
+import me.qcuncle.hook.TranslateTextMsg
 import top.xunflash.hook.MiniAppDirectJump
 import java.lang.reflect.Method
 
@@ -55,6 +57,8 @@ object MenuBuilderHook : BasePersistBackgroundHook() {
         MiniAppDirectJump,
         CopyMarkdown,
         MessageTTSHook,
+        EditTextContent,
+        TranslateTextMsg,
     )
 
     override fun initOnce(): Boolean {
