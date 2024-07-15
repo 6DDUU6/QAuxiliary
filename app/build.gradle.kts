@@ -43,6 +43,7 @@ plugins {
     id("build-logic.android.application")
     alias(libs.plugins.changelog)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.protobuf)
     alias(libs.plugins.serialization)
     alias(libs.plugins.aboutlibraries)
 }
@@ -283,7 +284,7 @@ dependencies {
     implementation(libs.byte.buddy)
     implementation(libs.dalvik.dx)
     ksp(libs.sealedEnum.ksp)
-    implementation(libs.google.protobuf)
+    implementation(libs.google.protobuf.java)
 }
 
 val adb: String = androidComponents.sdkComponents.adb.get().asFile.absolutePath
@@ -473,6 +474,24 @@ val generateEulaAndPrivacy by tasks.registering {
                 append("</body></html>")
             }.lines().joinToString("")
             it.writeText(output)
+        }
+    }
+}
+
+// see https://github.com/google/protobuf-gradle-plugin/issues/518
+protobuf {
+    protoc {
+        artifact = libs.google.protobuf.protoc.get().toString()
+    }
+    plugins {
+        generateProtoTasks {
+            all().forEach {
+                it.builtins {
+                    create("java") {
+                        option("lite")
+                    }
+                }
+            }
         }
     }
 }

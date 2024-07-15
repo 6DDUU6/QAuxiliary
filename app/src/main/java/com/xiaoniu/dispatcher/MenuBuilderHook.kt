@@ -38,6 +38,8 @@ import io.github.qauxv.hook.BasePersistBackgroundHook
 import io.github.qauxv.util.Initiator
 import me.hd.hook.menu.CopyMarkdown
 import me.hd.hook.menu.EditTextContent
+import me.hd.hook.menu.RecallMsgRecord
+import me.hd.hook.menu.RepeatToImg
 import me.ketal.hook.PicCopyToClipboard
 import me.qcuncle.hook.TranslateTextMsg
 import top.xunflash.hook.MiniAppDirectJump
@@ -59,6 +61,8 @@ object MenuBuilderHook : BasePersistBackgroundHook() {
         MessageTTSHook,
         EditTextContent,
         TranslateTextMsg,
+        RecallMsgRecord,
+        RepeatToImg,
     )
 
     override fun initOnce(): Boolean {
