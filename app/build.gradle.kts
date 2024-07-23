@@ -264,6 +264,7 @@ dependencies {
     compileOnly(projects.loader.hookapi)
     runtimeOnly(projects.loader.sbl)
     implementation(projects.loader.startup)
+    compileOnly(libs.xposed.api)
     // ksp
     ksp(projects.libs.ksp)
     // host stub
