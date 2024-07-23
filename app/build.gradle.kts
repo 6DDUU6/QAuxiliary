@@ -60,6 +60,7 @@ if (ccacheExecutablePath != null) {
 }
 
 val fullNativeDebugMode = false
+val isNewXposedApiEnabled = true
 
 fun getSignatureKeyDigest(signConfig: SigningConfig?): String? {
     var key1: String? = if (signConfig != null && signConfig.storeFile != null) {
@@ -206,12 +207,17 @@ android {
         )
     }
     packaging {
-        resources.excludes.addAll(arrayOf(
-            "META-INF/**",
-            "kotlin/**",
-            "**.bin",
-            "kotlin-tooling-metadata.json"
-        ))
+        // libxposed API uses META-INF/xposed
+        resources.excludes.addAll(
+            arrayOf(
+                "kotlin/**",
+                "**.bin",
+                "kotlin-tooling-metadata.json"
+            )
+        )
+        if (!isNewXposedApiEnabled) {
+            resources.excludes.add("META-INF/xposed/**")
+        }
     }
 
     buildFeatures {
@@ -248,6 +254,9 @@ kotlin {
     sourceSets.configureEach {
         kotlin.srcDir("$buildDir/generated/ksp/$name/kotlin/")
     }
+    sourceSets.main {
+        kotlin.srcDir(File(rootDir, "libs/ezxhelper/src/main/java"))
+    }
 }
 
 dependencies {
@@ -255,8 +264,6 @@ dependencies {
     compileOnly(projects.loader.hookapi)
     runtimeOnly(projects.loader.sbl)
     implementation(projects.loader.startup)
-    // TODO: 2024-07-21 remove libs.xposed.api once refactor done
-    compileOnly(libs.xposed.api)
     // ksp
     ksp(projects.libs.ksp)
     // host stub
