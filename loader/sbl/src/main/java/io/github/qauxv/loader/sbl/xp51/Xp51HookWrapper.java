@@ -128,6 +128,7 @@ public class Xp51HookWrapper {
             // for gc
             param.setObjectExtra(tag, null);
             hcbParam.mParam = null;
+            hcbParam.mExtra = null;
         }
     }
 
@@ -166,6 +167,10 @@ public class Xp51HookWrapper {
             mCallback.mAlive = false;
         }
 
+    }
+
+    public static int getHookCounter() {
+        return (int) (sNextHookId.get() - 1);
     }
 
 }
