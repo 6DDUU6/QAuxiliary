@@ -31,6 +31,7 @@ import com.android.tools.build.apkzlib.zip.CompressionMethod
 import com.android.tools.build.apkzlib.zip.ZFile
 import com.android.tools.build.apkzlib.zip.ZFileOptions
 import org.jetbrains.changelog.markdownToHTML
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.FileInputStream
 import java.security.KeyStore
 import java.security.MessageDigest
@@ -96,7 +97,7 @@ fun getSignatureKeyDigest(signConfig: SigningConfig?): String? {
 
 android {
     namespace = "io.github.qauxv"
-    ndkVersion = "25.1.8937393"
+    ndkVersion = Version.getNdkVersion(rootProject)
     defaultConfig {
         applicationId = "io.github.qauxv"
         buildConfigField("String", "BUILD_UUID", "\"$currentBuildUuid\"")
@@ -123,7 +124,9 @@ android {
                     "-Wno-unused-command-line-argument",
                     "-DMMKV_DISABLE_CRYPT",
                 )
-                cppFlags("-std=c++20", *flags)
+                // do not add -std=c++20 here, it should be added in the CMakeLists.txt where each module is defined
+                // some modules uses features that are REMOVED or deprecated in C++20
+                cppFlags(*flags)
                 cFlags("-std=c18", *flags)
                 targets += "qauxv"
             }
@@ -308,6 +311,8 @@ dependencies {
     implementation(libs.dexlib2)
     // I don't know why, but without this, compilation will fail
     implementation(libs.google.guava)
+    // for get activation status
+    implementation(projects.libs.libxposed.service)
 }
 
 val adb: String = androidComponents.sdkComponents.adb.get().asFile.absolutePath
@@ -516,5 +521,25 @@ protobuf {
                 }
             }
         }
+    }
+}
+
+// force kotlin to produce java 11 class files
+tasks.withType<KotlinCompile> {
+    kotlinOptions {
+        jvmTarget = "11"
+    }
+}
+
+// force javac to produce java 11 class files
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
+// javac should be able to read java 17 class files, although we force it to produce java 11 class files for this module
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
     }
 }

@@ -40,7 +40,7 @@ dependencyResolutionManagement {
 includeBuild("build-logic")
 
 plugins {
-    id("com.gradle.develocity") version "3.17.5"
+    id("com.gradle.develocity") version "3.17.6"
     id("org.gradle.toolchains.foojay-resolver-convention") version ("0.8.0")
 }
 
@@ -52,7 +52,7 @@ develocity {
         val ci = System.getenv("GITHUB_ACTIONS") == "true"
         publishing {
             onlyIf { System.getenv("GITHUB_ACTIONS") == "true" }
-            onlyIf { !isOffline && (it.buildResult.failures.isNotEmpty() || ci) }
+            // onlyIf { !isOffline && (it.buildResult.failures.isNotEmpty() || ci) }
         }
     }
 }
@@ -69,5 +69,6 @@ include(
     ":libs:dexkit",
     ":libs:ezXHelper",
     ":libs:xView",
-    ":libs:libxposed",
+    ":libs:libxposed:api",
+    ":libs:libxposed:service",
 )
