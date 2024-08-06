@@ -24,15 +24,18 @@ package io.github.qauxv.poststartup;
 import android.app.Application;
 import android.content.Context;
 import android.os.Build;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.github.kyuubiran.ezxhelper.init.InitFields;
-import com.github.kyuubiran.ezxhelper.utils.Log;
 import io.github.qauxv.core.MainHook;
 import io.github.qauxv.core.NativeCoreBridge;
 import io.github.qauxv.util.HostInfo;
 import io.github.qauxv.util.Initiator;
+import io.github.qauxv.util.Log;
 import io.github.qauxv.util.Natives;
 import io.github.qauxv.util.hookimpl.InMemoryClassLoaderHelper;
 import io.github.qauxv.util.hookimpl.LibXposedNewApiByteCodeGenerator;
+import io.github.qauxv.util.hookimpl.lsplant.LsplantHookImpl;
 import java.lang.reflect.Field;
 
 public class StartupRoutine {
@@ -51,19 +54,23 @@ public class StartupRoutine {
      * @param lpwReserved null, not used
      * @param bReserved   false, not used
      */
-    public static void execPostStartupInit(Context ctx, Object step, String lpwReserved, boolean bReserved) {
+    public static void execPostStartupInit(@NonNull Context ctx, @Nullable Object step, String lpwReserved, boolean bReserved) {
         // init all kotlin utils here
         HostInfo.init((Application) ctx);
         Initiator.init(ctx.getClassLoader());
         InitFields.ezXClassLoader = ctx.getClassLoader();
         // resource injection is done somewhere else, do not init it here
-        Log.INSTANCE.getCurrentLogger().setLogTag("QAuxv");
+        com.github.kyuubiran.ezxhelper.utils.Log.INSTANCE.getCurrentLogger().setLogTag("QAuxv");
         Natives.initialize(ctx);
         overrideLSPatchModifiedVersionCodeIfNecessary(ctx);
         NativeCoreBridge.initNativeCore(ctx.getPackageName(), Build.VERSION.SDK_INT,
-                HostInfo.getHostInfo().getVersionName(), HostInfo.getHostInfo().getVersionCode());
+                HostInfo.getHostInfo().getVersionName(), HostInfo.getHostInfo().getVersionCode(), true);
         StartupInfo.getLoaderService().setClassLoaderHelper(InMemoryClassLoaderHelper.INSTANCE);
         LibXposedNewApiByteCodeGenerator.init();
+        if (StartupInfo.getHookBridge() == null) {
+            Log.w("HookBridge is null, fallback to embedded LSPlant.");
+            LsplantHookImpl.initializeLsplantHookBridge();
+        }
         MainHook.getInstance().performHook(ctx, step);
     }
 

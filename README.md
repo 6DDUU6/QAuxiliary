@@ -96,12 +96,24 @@ QAuxiliary 将为分 `CI` 和 `推荐的CI` 两个版本
 
 ## 编译
 
-1. 安装 git, ccache(可选), cmake, SDK 和 NDK, 版本参考 [Version.kt](build-logic/convention/src/main/kotlin/Version.kt);  
+1. 安装 git, ccache(可选), cmake, SDK 和 NDK, JDK 17+, 版本参考 [Version.kt](build-logic/convention/src/main/kotlin/Version.kt);  
+   JDK 版本最低 17, 当然使用 21 也是可以的。  
    注意: 编译脚本会自动寻找 ccache 并使用，而 Windows 平台下 msys2 的 ccache 存在问题会卡在 sync 阶段，
    建议 Windows 用户使用从 ccache 官网下载的 ccache 而不是 msys2 的 ccache;  
    另外你也可以选择不使用 ccache (如果你已经安装了 ccache 但不想使用，可以修改 [build.gradle.kts](app/build.gradle.kts)
    中的 `ccacheExecutablePath` 为 `null`)
-2. 将本仓库 clone 至本地：`git clone --recursive https://github.com/cinit/QAuxiliary`;
+2. 将本仓库 clone 至本地；由于本项目使用的 submodule 含有一些不需要的以及非公开的二级 submodule, 请参考以下命令 clone 本项目以跳过这些 submodule:
+   ```shell
+   git clone https://github.com/cinit/QAuxiliary
+   cd QAuxiliary
+   git submodule update --init
+   git -C "libs/LSPlant" config "submodule.test/src/main/jni/external/lsprism.update" none
+   git -C "libs/LSPlant" config "submodule.test/src/main/jni/external/lsparself.update" none
+   git -C "libs/LSPlant" config "submodule.docs/doxygen-awesome-css.update" none
+   git -C "libs/mmkv/MMKV" config "submodule.Python/pybind11.update" none
+   git submodule foreach git submodule update --init --recursive
+   ```
+   去除不使用的 submodule 后，一共有 14 个 submodule, 如果 clone 了很久也没有完成，请检查您的网络以及代理是否配置正确。
 3. 使用 Gradle 编译安装包: `./gradlew :app:assembleDebug` 或者 `./gradlew :app:synthesizeDistReleaseApksCI`;
 
 ---

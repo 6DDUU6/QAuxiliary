@@ -22,6 +22,7 @@
 #include "art/runtime/dex_file.hpp"
 
 // undefine macros from logging.hpp
+#undef LOGV
 #undef LOGD
 #undef LOGI
 #undef LOGW
@@ -30,12 +31,14 @@
 
 #include "utils/Log.h"
 
+namespace qauxv {
+
 static FileMemMap sLibArtFileMap;
 static utils::ElfView sLibArtElfView;
 static std::mutex sLibArtViewInitMutex;
 static void* sLibArtBaseAddress = nullptr;
 
-static std::string GetLibArtPath() {
+std::string GetLibArtPath() {
     utils::ProcessView processView;
     if (processView.readProcess(getpid()) != 0) {
         return {};
@@ -49,7 +52,7 @@ static std::string GetLibArtPath() {
     return {};
 }
 
-static bool InitLibArtElfView() {
+bool InitLibArtElfView() {
     if (sLibArtElfView.IsValid()) {
         return true;
     }
@@ -65,7 +68,7 @@ static bool InitLibArtElfView() {
     return sLibArtElfView.IsValid();
 }
 
-static bool InitLSPlantImpl(JNIEnv* env) {
+bool InitLSPlantImpl(JNIEnv* env) {
     const auto initProc = [env] {
         ::lsplant::InitInfo sLSPlantInitInfo = {
                 .inline_hooker = [](auto t, auto r) {
@@ -82,7 +85,7 @@ static bool InitLSPlantImpl(JNIEnv* env) {
                         result = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(sLibArtBaseAddress) + offset);
                     } else {
                         result = nullptr;
-                        LOGW("art symbol exact '{}' not found", symbol);
+                        LOGD("art symbol exact '{}' not found", symbol);
                     }
                     return result;
                 },
@@ -93,7 +96,7 @@ static bool InitLSPlantImpl(JNIEnv* env) {
                         result = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(sLibArtBaseAddress) + offset);
                     } else {
                         result = nullptr;
-                        LOGW("art symbol prefix '{}' not found", symbol);
+                        LOGD("art symbol prefix '{}' not found", symbol);
                     }
                     return result;
                 }
@@ -104,8 +107,11 @@ static bool InitLSPlantImpl(JNIEnv* env) {
     return sLSPlantInitializeResult;
 }
 
+}
+
 extern "C" JNIEXPORT jobject JNICALL
 Java_io_github_qauxv_util_dyn_MemoryDexLoader_nativeCreateClassLoaderWithDexBelowOreo(JNIEnv* env, jclass clazz, jbyteArray dex_file, jobject parent) {
+    using namespace qauxv;
     // This method is only used for Android 8.0 and below.
     if (dex_file == nullptr) {
         env->ThrowNew(env->FindClass("java/lang/NullPointerException"), "dex_file is null");
@@ -189,6 +195,7 @@ Java_io_github_qauxv_util_dyn_MemoryDexLoader_nativeCreateDexFileFormBytesBelowO
                                                                                     jbyteArray dex_bytes,
                                                                                     jobject defining_context,
                                                                                     jstring jstr_name) {
+    using namespace qauxv;
     // This method is only used for Android 8.0 and below.
     if (dex_bytes == nullptr) {
         env->ThrowNew(env->FindClass("java/lang/NullPointerException"), "dex_file is null");

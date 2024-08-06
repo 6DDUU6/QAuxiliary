@@ -67,6 +67,7 @@ add_library(qauxv SHARED
         qauxv_core/HostInfo.cc
         qauxv_core/NativeCoreBridge.cc
         qauxv_core/linker_utils.cc
+        qauxv_core/LsplantBridge.cc
 
         utils/shared_memory.cpp
         utils/auto_close_fd.cc
@@ -82,6 +83,7 @@ add_library(qauxv SHARED
         utils/AobScanUtils.cc
         utils/arch_utils.cc
         utils/MemoryDexLoader.cc
+        utils/debug_utils.cc
 
         ntkernel/NtRecallMsgHook.cc
 

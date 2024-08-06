@@ -33,6 +33,7 @@ import io.github.qauxv.loader.hookapi.ILoaderService;
 import io.github.qauxv.poststartup.StartupInfo;
 import io.github.qauxv.util.HostInfo;
 import io.github.qauxv.util.Natives;
+import io.github.qauxv.util.hookimpl.lsplant.LsplantHookImpl;
 import org.lsposed.hiddenapibypass.HiddenApiBypass;
 
 public class ModuleAppImpl extends Application {
@@ -50,7 +51,7 @@ public class ModuleAppImpl extends Application {
             HiddenApiBypass.setHiddenApiExemptions("L");
         }
         NativeCoreBridge.initNativeCore(getPackageName(), Build.VERSION.SDK_INT,
-                HostInfo.getHostInfo().getVersionName(), HostInfo.getHostInfo().getVersionCode());
+                HostInfo.getHostInfo().getVersionName(), HostInfo.getHostInfo().getVersionCode(), false);
         initStartupInfo();
         // for fail-safe purpose
         com.github.kyuubiran.ezxhelper.utils.Log.INSTANCE.getCurrentLogger().setLogTag("QAuxv");
