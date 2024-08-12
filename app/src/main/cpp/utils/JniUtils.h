@@ -27,13 +27,25 @@
 
 #include <cstdint>
 #include <string>
+#include <string_view>
 #include <optional>
 #include <jni.h>
 
 
 namespace qauxv {
 
+namespace ExceptionNames {
+
+constexpr auto kRuntimeException = "java/lang/RuntimeException";
+constexpr auto kIllegalArgumentException = "java/lang/IllegalArgumentException";
+constexpr auto kIllegalStateException = "java/lang/IllegalStateException";
+constexpr auto kNullPointerException = "java/lang/NullPointerException";
+
+}
+
 std::optional<std::string> JstringToString(JNIEnv* env, jstring jstr);
+
+void ThrowIfNoPendingException(JNIEnv* env, const char* klass, std::string_view msg);
 
 }
 
