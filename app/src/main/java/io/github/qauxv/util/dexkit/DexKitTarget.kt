@@ -867,14 +867,14 @@ data object QQ_SETTING_ME_CONFIG_CLASS : DexKitTarget.UsingStringVector() {
             "我的文件",
             "我的收藏",
             "我的相册",
-            "我的小游戏",
+            //"我的小游戏", // removed since 9.0.90
             "免流量",
             "我的个性装扮",
             "财富小金库",
             "我的QQ钱包",
             "开通会员",
             "我的小世界",
-            "直播"
+            //"直播" // removed since 9.0.90
         )
     )
     override val declaringClass: String = ""
@@ -1023,4 +1023,10 @@ data object Hd_GagInfoDisclosure_Method : DexKitTarget.UsingStr() {
     override val traitString = arrayOf("<---0x2dc push  groupCode:")
     override val declaringClass = "com.tencent.imcore.message"
     override val filter = DexKitFilter.strInClsName("com/tencent/imcore/message/")
+}
+
+data object OriginalPhotoNT_onInitView : DexKitTarget.UsingDexkit() {
+    override val findMethod: Boolean = true
+    override val declaringClass = ""
+    override val filter: dexkitFilter = DexKitFilter.allowAll
 }

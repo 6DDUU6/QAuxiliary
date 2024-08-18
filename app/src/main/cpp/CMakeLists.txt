@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.10...3.27)
+cmake_minimum_required(VERSION 3.28)
+# because cmake 3.28 support C++ modules
 project(qauxv)
 
 find_library(ANDROID_LIBS log)
@@ -26,7 +27,7 @@ endif ()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CLANG_CXX_EXTRA_OPT} -fPIC -Werror=return-type -Wno-invalid-offsetof")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CLANG_C_EXTRA_OPT} -fPIC -Werror=return-type")
 
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-allow-shlib-undefined,--no-undefined -Wl,-z,defs,-z,now,-z,relro")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-z,max-page-size=16384 -Wl,--no-allow-shlib-undefined,--no-undefined -Wl,-z,defs,-z,now,-z,relro")
 
 SET_OPTION(DOBBY_GENERATE_SHARED OFF)
 # Do not use Dobby symbol resolver. You link it once and it crashes everywhere.
@@ -88,6 +89,8 @@ add_library(qauxv-core0 SHARED
         utils/debug_utils.cc
         utils/Log.cc
         utils/art_symbol_resolver.cc
+        utils/xz_decoder.cc
+        utils/byte_array_output_stream.cc
 
         ntkernel/NtRecallMsgHook.cc
         ntkernel/card_msg_sender.cc
@@ -108,5 +111,10 @@ target_compile_definitions(qauxv-core0 PRIVATE QAUXV_VERSION=\"${QAUXV_VERSION}\
 target_link_options(qauxv-core0 PRIVATE "-Wl,-e,__libqauxv_main")
 
 target_link_libraries(qauxv-core0 dobby mmkv dexkit_static unwindstack base silk
-        c dl fmt-header-only z lsplant_static
-        ${ANDROID_LIBS})
+        c dl fmt-header-only z lzma lsplant_static ${ANDROID_LIBS}
+)
+
+add_library(qauxv-dummy SHARED dummy/dummy.cc)
+add_library(qauxv-preload SHARED preload/preload.cc)
+target_link_libraries(qauxv-dummy unwindstack base c ${ANDROID_LIBS})
+target_link_libraries(qauxv-preload unwindstack base c dl ${ANDROID_LIBS})
