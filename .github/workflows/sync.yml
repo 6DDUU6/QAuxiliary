@@ -26,7 +26,7 @@ jobs:
 
       - name: Sync fork
         id: sync
-        uses: 6DDUU6/repo-sync@master
+        uses: 6DDUU6/repo-sync@qaux
         with:
           token: ${{ secrets.HUB_TOKEN }}
           up_repo: 'cinit/QAuxiliary'
