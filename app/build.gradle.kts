@@ -265,6 +265,8 @@ android {
             keepDebugSymbols += "**/*.so"
         }
     }
+    // not use embedded dex
+    packagingOptions.dex.useLegacyPackaging = true
 }
 
 kotlin {
