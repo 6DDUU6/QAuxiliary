@@ -751,7 +751,7 @@ public class PacketHook {
             log("开始禁用新版msf");
             Class clz = load("com.tencent.mobileqq.msf.core.f0.b");
             if (clz == null) {
-                log("McHookTool: tools.util isnull");
+                log("McHookTool: msf.core.f0.b isnull");
             }
             XC_MethodHook disableMSF = new XC_MethodHook() {
                 @Override
@@ -760,7 +760,7 @@ public class PacketHook {
                         return;
                     }
                     if (param.args.length == 2) {
-                        param.args[1] = false
+                        param.args[1] = false;
                     }
                 }
             };
