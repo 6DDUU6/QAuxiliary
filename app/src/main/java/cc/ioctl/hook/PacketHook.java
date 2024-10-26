@@ -744,4 +744,31 @@ public class PacketHook {
             return false;
         }
     }
+
+    public boolean disableNewMSF(Context ctx) {
+        try {
+            log("开始禁用新版msf");
+            Class clz = load("com.tencent.mobileqq.msf.core.f0.b");
+            if (clz == null) {
+                log("McHookTool: tools.util isnull");
+            }
+            XC_MethodHook disableMSF = new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    if (McHookStatus.getOpenStatus() == 0) {
+                        return;
+                    }
+                    if (param.args.length == 2) {
+                        param.args[1] = false
+                    }
+                }
+            };
+            XposedBridge.hookAllMethods(clz, "a", disableMSF);
+            return true;
+        } catch (Throwable e) {
+            log(e);
+            return false;
+        }
+    }
+
 }
