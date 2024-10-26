@@ -625,6 +625,7 @@ public class PacketHook {
             initRandomGuid();
         }
         saveGuid(ctx);
+        disableNewMSF(ctx);
     }
 
     public boolean initOnce() {
