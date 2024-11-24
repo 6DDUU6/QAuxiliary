@@ -34,13 +34,23 @@ dependencyResolutionManagement {
             }
         }
         mavenCentral()
+        maven("https://maven.tmpfs.dev/repository/maven-public/") {
+            // I have no idea why sometimes jitpack.io is not working for
+            // "com.github.plattysoft:Leonids:1746429"
+            // So I added this repo as a backup.
+            // I have encountered this wired issue twice in 2024.
+            // The jitpack.io says "Not found" or "File not found. Build ok".
+            content {
+                includeGroup("com.github.plattysoft")
+            }
+        }
     }
 }
 
 includeBuild("build-logic")
 
 plugins {
-    id("com.gradle.develocity") version "3.18.1"
+    id("com.gradle.develocity") version "3.18.2"
     id("org.gradle.toolchains.foojay-resolver-convention") version ("0.8.0")
 }
 
