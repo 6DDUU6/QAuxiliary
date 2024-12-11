@@ -22,32 +22,40 @@
 
 package me.hd.hook
 
-import cc.ioctl.util.hookBeforeIfEnabled
+import android.view.ViewGroup
+import android.widget.TextView
+import cc.ioctl.util.hookAfterIfEnabled
+import com.github.kyuubiran.ezxhelper.utils.findViewByCondition
+import com.github.kyuubiran.ezxhelper.utils.setViewZeroSize
 import io.github.qauxv.base.annotation.FunctionHookEntry
 import io.github.qauxv.base.annotation.UiItemAgentEntry
 import io.github.qauxv.dsl.FunctionEntryRouter
 import io.github.qauxv.hook.CommonSwitchFunctionHook
-import io.github.qauxv.util.Initiator
 import io.github.qauxv.util.QQVersion
 import io.github.qauxv.util.requireMinQQVersion
+import xyz.nextalone.util.method
 
 @FunctionHookEntry
 @UiItemAgentEntry
-object ServiceShowRemove : CommonSwitchFunctionHook() {
+object HideBottomTabTitle : CommonSwitchFunctionHook() {
 
-    override val name = "业务右上角显示移除"
-    override val description = "动态-更多, 业务页可移除游戏中心等"
-    override val extraSearchKeywords = arrayOf("游戏中心")
-    override val uiItemLocation = FunctionEntryRouter.Locations.Simplify.MAIN_UI_OPERATION_LOG
+    override val name = "隐藏底栏标题"
+    override val uiItemLocation = FunctionEntryRouter.Locations.Simplify.UI_MISC
     override val isAvailable = requireMinQQVersion(QQVersion.QQ_8_9_88)
 
     override fun initOnce(): Boolean {
-        val lebaPluginInfoClass = Initiator.loadClass("com.tencent.mobileqq.leba.entity.LebaPluginInfo")
-        val allowMethod = lebaPluginInfoClass.getDeclaredMethod(
-            if (requireMinQQVersion(QQVersion.QQ_9_0_35)) "isAllowUserChange" else "getAllowModify"
-        )
-        hookBeforeIfEnabled(allowMethod) { param ->
-            param.result = true
+        val generateTabItemMethod = if (requireMinQQVersion(QQVersion.QQ_9_0_30)) {
+            "Lcom/tencent/mobileqq/activity/home/impl/TabFrameControllerImpl;->generateTabItem(IIIIILjava/lang/String;IIIILjava/lang/String;Ljava/lang/String;)Landroid/view/View;"
+        } else {
+            "Lcom/tencent/mobileqq/activity/home/impl/TabFrameControllerImpl;->generateTabItem(IIIIIIIIILjava/lang/String;Ljava/lang/String;)Landroid/view/View;"
+        }.method
+        hookAfterIfEnabled(generateTabItemMethod) { param ->
+            val view = param.result as ViewGroup
+            view.findViewByCondition {
+                it is TextView
+            }?.apply {
+                setViewZeroSize()
+            }
         }
         return true
     }
