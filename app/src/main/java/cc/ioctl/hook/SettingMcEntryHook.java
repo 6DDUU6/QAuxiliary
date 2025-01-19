@@ -70,7 +70,6 @@ import cc.ioctl.util.ui.ViewBuilder;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
-import io.github.qauxv.BuildConfig;
 import io.github.qauxv.R;
 import io.github.qauxv.activity.SettingsUiFragmentHostActivity;
 import io.github.qauxv.base.annotation.FunctionHookEntry;
@@ -126,17 +125,35 @@ public class SettingMcEntryHook extends BasePersistBackgroundHook {
         Class<?> kMainSettingFragment = Initiator.load("com.tencent.mobileqq.setting.main.MainSettingFragment");
         if (kMainSettingFragment != null) {
             Class<?> kMainSettingConfigProvider = Initiator.loadClass("com.tencent.mobileqq.setting.main.MainSettingConfigProvider");
-            Method getItemProcessList = Reflex.findSingleMethod(kMainSettingConfigProvider, List.class, false, Context.class);
+            // 9.1.20+, NewSettingConfigProvider, A/B test on 9.1.20
+            Class<?> kNewSettingConfigProvider = Initiator.load("com.tencent.mobileqq.setting.main.NewSettingConfigProvider");
+            Method getItemProcessListOld = Reflex.findSingleMethod(kMainSettingConfigProvider, List.class, false, Context.class);
+            Method getItemProcessListNew = null;
+            if (kNewSettingConfigProvider != null) {
+                getItemProcessListNew = Reflex.findSingleMethod(kNewSettingConfigProvider, List.class, false, Context.class);
+            }
             Class<?> kAbstractItemProcessor = Initiator.loadClass("com.tencent.mobileqq.setting.main.processor.AccountSecurityItemProcessor").getSuperclass();
-            // 8.9.70 ~ 9.0.0
-            Class<?> kSimpleItemProcessor = Initiator.loadClass("com.tencent.mobileqq.setting.processor.g");
-            if (kSimpleItemProcessor.getSuperclass() != kAbstractItemProcessor) {
-                // 9.0.8+
-                kSimpleItemProcessor = Initiator.loadClass("com.tencent.mobileqq.setting.processor.h");
-                if (kSimpleItemProcessor.getSuperclass() != kAbstractItemProcessor) {
-                    throw new IllegalStateException("kSImpleItemProcessor.getSuperclass() != kAbstractItemProcessor");
+            // SimpleItemProcessor has too few xrefs. I have no idea how to find it without a list of candidates.
+            final String[] possibleSimpleItemProcessorNames = new String[]{
+                    // 8.9.70 ~ 9.0.0
+                    "com.tencent.mobileqq.setting.processor.g",
+                    // 9.0.8+
+                    "com.tencent.mobileqq.setting.processor.h",
+                    // QQ 9.1.28.21880 (8398) gray
+                    "as3.i",
+            };
+            List<Class<?>> possibleSimpleItemProcessorCandidates = new ArrayList<>(4);
+            for (String name : possibleSimpleItemProcessorNames) {
+                Class<?> klass = Initiator.load(name);
+                if (klass != null && klass.getSuperclass() == kAbstractItemProcessor) {
+                    possibleSimpleItemProcessorCandidates.add(klass);
                 }
             }
+            // assert possibleSimpleItemProcessorCandidates.size() == 1;
+            if (possibleSimpleItemProcessorCandidates.size() != 1) {
+                throw new IllegalStateException("possibleSimpleItemProcessorCandidates.size() != 1, got " + possibleSimpleItemProcessorCandidates);
+            }
+            Class<?> kSimpleItemProcessor = possibleSimpleItemProcessorCandidates.get(0);
             Method setOnClickListener;
             {
                 List<Method> candidates = ArraysKt.filter(kSimpleItemProcessor.getDeclaredMethods(), m -> {
@@ -151,7 +168,7 @@ public class SettingMcEntryHook extends BasePersistBackgroundHook {
                 setOnClickListener = candidates.get(0);
             }
             Constructor<?> ctorSimpleItemProcessor = kSimpleItemProcessor.getDeclaredConstructor(Context.class, int.class, CharSequence.class, int.class);
-            HookUtils.hookAfterAlways(this, getItemProcessList, 50, param -> {
+            io.github.qauxv.util.xpcompat.XC_MethodHook callback = HookUtils.afterAlways(this, 50, param -> {
                 List<Object> result = (List<Object>) param.getResult();
                 Context ctx = (Context) param.args[0];
                 Class<?> kItemProcessorGroup = result.get(0).getClass();
@@ -175,8 +192,14 @@ public class SettingMcEntryHook extends BasePersistBackgroundHook {
                 ArrayList<Object> list = new ArrayList<>(1);
                 list.add(entryItem);
                 Object group = ctor.newInstance(list, "", "");
-                result.add(1, group);
+                boolean isNew = param.thisObject.getClass().getName().contains("NewSettingConfigProvider");
+                int indexToInsert = isNew ? 2 : 1;
+                result.add(indexToInsert, group);
             });
+            io.github.qauxv.util.xpcompat.XposedBridge.hookMethod(getItemProcessListOld, callback);
+            if (getItemProcessListNew != null) {
+                io.github.qauxv.util.xpcompat.XposedBridge.hookMethod(getItemProcessListNew, callback);
+            }
         }
     }
 
