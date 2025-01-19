@@ -106,17 +106,20 @@ public class SettingMcEntryHook extends BasePersistBackgroundHook {
     @Override
     public boolean initOnce() throws Exception {
         injectSettingEntryForMainSettingConfigProvider();
+        XposedBridge.log("Mchook init1");
         // below 8.9.70
         Class<?> kQQSettingSettingActivity = Initiator._QQSettingSettingActivity();
         if (kQQSettingSettingActivity != null) {
             XposedHelpers.findAndHookMethod(kQQSettingSettingActivity, "doOnCreate", Bundle.class, mAddModuleEntry);
         }
+        XposedBridge.log("Mchook init2");
         Class<?> kQQSettingSettingFragment = Initiator._QQSettingSettingFragment();
         if (kQQSettingSettingFragment != null) {
             Method doOnCreateView = kQQSettingSettingFragment.getDeclaredMethod("doOnCreateView",
                     LayoutInflater.class, ViewGroup.class, Bundle.class);
             XposedBridge.hookMethod(doOnCreateView, mAddModuleEntry);
         }
+        XposedBridge.log("Mchook init3");
         return true;
     }
 
@@ -162,8 +165,9 @@ public class SettingMcEntryHook extends BasePersistBackgroundHook {
                     return m.getReturnType() == void.class && argt.length == 1 && Function0.class.getName().equals(argt[0].getName());
                 });
                 candidates.sort(Comparator.comparing(Method::getName));
-                if (candidates.size() != 2) {
-                    throw new IllegalStateException("com.tencent.mobileqq.setting.processor.g.?(Function0)V candidates.size() != 2");
+                // TIM 4.0.95.4001 only have one method, that is the one we need (onClick() lambda)
+                if (candidates.size() != 2 && candidates.size() != 1) {
+                    throw new IllegalStateException("com.tencent.mobileqq.setting.processor.g.?(Function0)V candidates.size() != 1|2");
                 }
                 setOnClickListener = candidates.get(0);
             }
@@ -193,7 +197,7 @@ public class SettingMcEntryHook extends BasePersistBackgroundHook {
                 list.add(entryItem);
                 Object group = ctor.newInstance(list, "", "");
                 boolean isNew = param.thisObject.getClass().getName().contains("NewSettingConfigProvider");
-                int indexToInsert = isNew ? 2 : 1;
+                int indexToInsert = isNew ? 3 : 2;
                 result.add(indexToInsert, group);
             });
             io.github.qauxv.util.xpcompat.XposedBridge.hookMethod(getItemProcessListOld, callback);
