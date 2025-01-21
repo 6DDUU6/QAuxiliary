@@ -37,12 +37,14 @@ import io.github.qauxv.dsl.FunctionEntryRouter
 import io.github.qauxv.hook.CommonSwitchFunctionHook
 import io.github.qauxv.util.Initiator
 import io.github.qauxv.util.QQVersion
+import io.github.qauxv.util.TIMVersion
 import io.github.qauxv.util.SyncUtils
 import io.github.qauxv.util.dexkit.AIOTitleVB_updateLeftTopBack_NT
 import io.github.qauxv.util.dexkit.CCustomWidgetUtil_updateCustomNoteTxt_NT
 import io.github.qauxv.util.dexkit.DexKit
 import io.github.qauxv.util.dexkit.NCustomWidgetUtil_updateCustomNoteTxt
 import io.github.qauxv.util.requireMinQQVersion
+import io.github.qauxv.util.requireMinTimVersion
 import io.github.qauxv.util.xpcompat.XC_MethodHook.MethodHookParam
 import me.ketal.util.findViewByType
 import xyz.nextalone.util.get
@@ -123,10 +125,10 @@ object ShowMsgCount : CommonSwitchFunctionHook(
                 }
         }
 
-        if (requireMinQQVersion(QQVersion.QQ_9_0_8)) {
+        if (requireMinQQVersion(QQVersion.QQ_9_0_8) || requireMinTimVersion(TIMVersion.TIM_4_0_95_BETA)) {
             // 群聊消息数量 + 群聊左上角返回
             val clz = Initiator.loadClass("com.tencent.mobileqq.quibadge.QUIBadge")
-            val (updateNumName, mNumName, mTextName) = if (requireMinQQVersion(QQVersion.QQ_9_0_15)) {
+            val (updateNumName, mNumName, mTextName) = if (requireMinQQVersion(QQVersion.QQ_9_0_15) || requireMinTimVersion(TIMVersion.TIM_4_0_95_BETA)) {
                 Triple("updateNum", "mNum", "mText")
             } else {
                 Triple("w", "j", "n")
@@ -186,7 +188,7 @@ object ShowMsgCount : CommonSwitchFunctionHook(
             }
         }
 
-        if (requireMinQQVersion(QQVersion.QQ_9_0_8)) {
+        if (requireMinQQVersion(QQVersion.QQ_9_0_8) || requireMinTimVersion(TIMVersion.TIM_4_0_95_BETA)) {
             // 总消息数量
             val clz = DexKit.requireClassFromCache(NCustomWidgetUtil_updateCustomNoteTxt)
             val method = clz.declaredMethods.single { method ->

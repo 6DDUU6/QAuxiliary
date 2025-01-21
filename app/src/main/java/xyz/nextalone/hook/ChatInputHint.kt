@@ -41,11 +41,14 @@ import io.github.qauxv.hook.CommonConfigFunctionHook
 import io.github.qauxv.ui.CommonContextWrapper
 import io.github.qauxv.util.Initiator
 import io.github.qauxv.util.QQVersion
+import io.github.qauxv.util.TIMVersion
 import io.github.qauxv.util.Toasts
 import io.github.qauxv.util.dexkit.AIO_InputRootInit_QQNT
 import io.github.qauxv.util.dexkit.DexKit
 import io.github.qauxv.util.dexkit.NBaseChatPie_init
+import io.github.qauxv.util.requireMaxQQVersion
 import io.github.qauxv.util.requireMinQQVersion
+import io.github.qauxv.util.requireMinTimVersion
 import kotlinx.coroutines.flow.MutableStateFlow
 import xyz.nextalone.util.findHostView
 import xyz.nextalone.util.hookAfter
@@ -63,6 +66,20 @@ object ChatInputHint : CommonConfigFunctionHook("na_chat_input_hint", arrayOf(NB
     private const val strCfg = "na_chat_input_hint_str"
 
     override fun initOnce(): Boolean = throwOrTrue {
+        if (requireMinTimVersion(TIMVersion.TIM_4_0_95_BETA)) {
+            // v4.0.98
+            // 7f116adf -> 说点什么...
+            // Lcom/tencent/tim/aio/inputbar/simpleui/a;->v()V
+            // Lcom/tencent/tim/aio/inputbar/simpleui/TimAIOInputSimpleUIVBDelegate;->B()V
+            "Lcom/tencent/tim/aio/inputbar/simpleui/TimAIOInputSimpleUIVBDelegate;->B()V".method.hookAfter(this) {
+                it.thisObject.javaClass.declaredFields.single { it.type == EditText::class.java }.apply {
+                    isAccessible = true
+                    val et = get(it.thisObject) as EditText
+                    et.hint = getValue()
+                }
+            }
+            return@throwOrTrue
+        }
         if (requireMinQQVersion(QQVersion.QQ_8_9_63_BETA_11345)) {
             // 私聊 && QQ9.0.35版本后的群聊
             DexKit.requireMethodFromCache(AIO_InputRootInit_QQNT).hookAfter(this) {
@@ -73,7 +90,7 @@ object ChatInputHint : CommonConfigFunctionHook("na_chat_input_hint", arrayOf(NB
                 }
             }
             // QQ9.0.35版本前的群聊
-            if (!requireMinQQVersion(QQVersion.QQ_9_0_35)) {
+            if (requireMaxQQVersion(QQVersion.QQ_9_0_30)) {
                 when { // Lcom/tencent/mobileqq/aio/input/anonymous/AnonymousModeInputVBDelegate;->setNotAnonymousHint()V
                     requireMinQQVersion(QQVersion.QQ_9_0_30) -> "Lcom/tencent/mobileqq/aio/input/c/c;->l()V"
                     requireMinQQVersion(QQVersion.QQ_9_0_20) -> "Lcom/tencent/mobileqq/aio/input/b/c;->l()V"
