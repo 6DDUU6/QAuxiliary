@@ -414,7 +414,7 @@ void qauxv::InitializeNativeHookApi(bool allowHookLinker) {
         sNativeHookHandle.hookFunction = +[](void* func, void* replace, void** backup) {
             return DobbyHook((void*) func, (dobby_dummy_func_t) replace, (dobby_dummy_func_t*) backup);
         };
-        DobbyHook((void *)fopen, (void *)fake_fopen, (void **)&orig_fopen);
+        sNativeHookHandle.hookFunction((void *)fopen, (void *)fake_fopen, (void **)&orig_fopen);
         sNativeHookHandle.unhookFunction = +[](void* func) {
             return DobbyDestroy((void*) func);
         };
