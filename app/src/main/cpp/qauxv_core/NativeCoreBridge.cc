@@ -34,7 +34,10 @@
 #include <unistd.h>
 #include <cstring>
 #include <cerrno>
-
+#include <fcntl.h>
+#include <cstdio>
+#include <iostream>
+#include <fstream>
 
 #include "HostInfo.h"
 #include "utils/JniUtils.h"
@@ -389,6 +392,17 @@ EXPORT extern "C" [[maybe_unused]] NativeOnModuleLoaded native_init(const Native
     return &qauxv::HandleLoadLibrary;
 }
 
+FILE *(*orig_fopen)(const char *filename, const char *mode);
+FILE *fake_fopen(const char *filename, const char *mode) {
+    FILE *result = NULL;
+    if (strstr(filename, "proc/pid/smap")) {
+        result = orig_fopen("/dev/null", mode);
+        return result;
+    }
+    result = orig_fopen(filename, mode);
+    return result;
+}
+
 void qauxv::InitializeNativeHookApi(bool allowHookLinker) {
     using namespace qauxv;
     if (sIsNativeHookInitialized) {
@@ -400,6 +414,7 @@ void qauxv::InitializeNativeHookApi(bool allowHookLinker) {
         sNativeHookHandle.hookFunction = +[](void* func, void* replace, void** backup) {
             return DobbyHook((void*) func, (dobby_dummy_func_t) replace, (dobby_dummy_func_t*) backup);
         };
+        DobbyHook((void *)fopen, (void *)fake_fopen, (void **)&orig_fopen);
         sNativeHookHandle.unhookFunction = +[](void* func) {
             return DobbyDestroy((void*) func);
         };

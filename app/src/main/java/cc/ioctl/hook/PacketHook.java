@@ -613,6 +613,7 @@ public class PacketHook {
 
     public void checkAndInit(Context ctx) {
         if (McHookStatus.getOpenStatus() == 1) {
+            disableNewMSF(ctx);
             initOnce();
         }
         if (McHookStatus.getCryptStatus() == 1) {
@@ -625,7 +626,6 @@ public class PacketHook {
             initRandomGuid();
         }
         saveGuid(ctx);
-        disableNewMSF(ctx);
     }
 
     public boolean initOnce() {
