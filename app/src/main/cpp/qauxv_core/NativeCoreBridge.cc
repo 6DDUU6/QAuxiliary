@@ -38,6 +38,7 @@
 #include <cstdio>
 #include <iostream>
 #include <fstream>
+#include <link.h>
 
 #include "HostInfo.h"
 #include "utils/JniUtils.h"
@@ -392,15 +393,33 @@ EXPORT extern "C" [[maybe_unused]] NativeOnModuleLoaded native_init(const Native
     return &qauxv::HandleLoadLibrary;
 }
 
-FILE *(*orig_fopen)(const char *filename, const char *mode);
-FILE *fake_fopen(const char *filename, const char *mode) {
-    FILE *result = NULL;
-    if (strstr(filename, "proc/pid/smap")) {
-        result = orig_fopen("/dev/null", mode);
-        return result;
+int (*Orig_dl_iterate_phdr)(int (*__callback)(struct dl_phdr_info*, size_t, void*), void* __data);
+
+typedef struct {
+    int (*callback)(struct dl_phdr_info*, size_t, void*);
+    void *original_data;
+} proxy_callback_data;
+
+int __proxy_callback(struct dl_phdr_info *info, size_t size, void *data) {
+    proxy_callback_data *proxy_data = (proxy_callback_data *)data;
+    //LOGV("[FekitDysm] Proxy callback called for %s\n", info->dlpi_name);
+    if (memcmp(info->dlpi_name,"/data/app/",10)) {
+        // 调用原始的__callback
+        return proxy_data->callback(info, size, proxy_data->original_data);
+    } else {
+        // 不调用原始的__callback，可以返回默认值或进行其他处理
+        return 0; // 假设0是成功的返回值
     }
-    result = orig_fopen(filename, mode);
-    return result;
+}
+
+int Hooked_dl_iterate_phdr(int (*__callback)(struct dl_phdr_info*, size_t, void*), void* __data){
+    // 创建封装了__callback和__data的结构体
+    proxy_callback_data proxy_data = {
+            .callback = __callback,
+            .original_data = __data
+    };
+    // 调用Orig_dl_iterate_phdr，传递__proxy_callback和封装了数据的结构体指针
+    return Orig_dl_iterate_phdr(__proxy_callback, &proxy_data);
 }
 
 void qauxv::InitializeNativeHookApi(bool allowHookLinker) {
@@ -414,7 +433,7 @@ void qauxv::InitializeNativeHookApi(bool allowHookLinker) {
         sNativeHookHandle.hookFunction = +[](void* func, void* replace, void** backup) {
             return DobbyHook((void*) func, (dobby_dummy_func_t) replace, (dobby_dummy_func_t*) backup);
         };
-        sNativeHookHandle.hookFunction((void *)fopen, (void *)fake_fopen, (void **)&orig_fopen);
+        sNativeHookHandle.hookFunction((void*) dl_iterate_phdr, (void*) Hooked_dl_iterate_phdr, (void**) &Orig_dl_iterate_phdr);
         sNativeHookHandle.unhookFunction = +[](void* func) {
             return DobbyDestroy((void*) func);
         };
@@ -426,7 +445,7 @@ void qauxv::InitializeNativeHookApi(bool allowHookLinker) {
             }
         }
     } else {
-        sNativeHookHandle.hookFunction((void *)fopen, (void *)fake_fopen, (void **)&orig_fopen);
+        sNativeHookHandle.hookFunction((void*) dl_iterate_phdr, (void*) Hooked_dl_iterate_phdr, (void**) &Orig_dl_iterate_phdr);
         LOGD("initNativeCore: native hook function is not null, use it directly");
     }
     sIsNativeHookInitialized = true;
