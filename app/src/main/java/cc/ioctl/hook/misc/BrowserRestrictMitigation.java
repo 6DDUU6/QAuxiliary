@@ -46,7 +46,7 @@ public class BrowserRestrictMitigation extends CommonSwitchFunctionHook {
     public static final BrowserRestrictMitigation INSTANCE = new BrowserRestrictMitigation();
 
     private BrowserRestrictMitigation() {
-        super(SyncUtils.PROC_TOOL, new DexKitTarget[]{NWebSecurityPluginV2_callback.INSTANCE});
+        super(null, true, new DexKitTarget[]{NWebSecurityPluginV2_callback.INSTANCE}, SyncUtils.PROC_TOOL);
     }
 
     @NonNull

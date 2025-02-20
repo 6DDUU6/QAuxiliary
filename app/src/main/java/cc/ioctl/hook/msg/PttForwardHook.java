@@ -121,7 +121,7 @@ public class PttForwardHook extends CommonSwitchFunctionHook implements OnMenuBu
     }
 
     private PttForwardHook() {
-        super(SyncUtils.PROC_MAIN, new DexKitTarget[]{CFaceDe.INSTANCE, CDialogUtil.INSTANCE, AbstractQQCustomMenuItem.INSTANCE});
+        super(null, true, new DexKitTarget[]{CFaceDe.INSTANCE, CDialogUtil.INSTANCE, AbstractQQCustomMenuItem.INSTANCE}, SyncUtils.PROC_MAIN);
     }
 
     @SuppressLint("SetTextI18n")

@@ -34,7 +34,7 @@ import io.github.qauxv.util.requireMinQQVersion
 
 @FunctionHookEntry
 @UiItemAgentEntry
-object EnableEmotionDownload : CommonSwitchFunctionHook(arrayOf(EmotionDownloadEnableSwitch)) {
+object EnableEmotionDownload : CommonSwitchFunctionHook(targets = arrayOf(EmotionDownloadEnableSwitch), defaultEnabled = true) {
     override val name = "允许保存图片表情"
 
     override fun initOnce(): Boolean {

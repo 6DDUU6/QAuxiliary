@@ -44,6 +44,7 @@ public class ShowAccurateGaggedTime extends CommonSwitchFunctionHook {
     public static final ShowAccurateGaggedTime INSTANCE = new ShowAccurateGaggedTime();
 
     private ShowAccurateGaggedTime() {
+        super(true);
     }
 
     @NonNull

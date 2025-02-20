@@ -48,7 +48,8 @@ import xyz.nextalone.util.throwOrTrue
 @FunctionHookEntry
 @UiItemAgentEntry
 object SortAtPanel : CommonSwitchFunctionHook(
-    arrayOf(NAtPanel_refreshUI, NAtPanel_showDialogAtView)
+    targets = arrayOf(NAtPanel_refreshUI, NAtPanel_showDialogAtView),
+    defaultEnabled = true
 ) {
 
     override val name = "修改@界面排序"

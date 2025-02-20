@@ -125,11 +125,11 @@ public class RevokeMsgHook extends CommonConfigFunctionHook {
 
     private RevokeMsgHook() {
         //FIXME: is MSF really necessary?
-        super(SyncUtils.PROC_MAIN | SyncUtils.PROC_MSF, new DexKitTarget[]{
+        super(null, true, new DexKitTarget[]{
                 CMessageRecordFactory.INSTANCE,
                 NContactUtils_getDiscussionMemberShowName.INSTANCE,
                 NContactUtils_getBuddyName.INSTANCE
-        });
+        }, SyncUtils.PROC_MAIN | SyncUtils.PROC_MSF);
     }
 
     @NonNull

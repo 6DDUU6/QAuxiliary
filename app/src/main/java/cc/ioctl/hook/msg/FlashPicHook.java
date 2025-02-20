@@ -40,6 +40,7 @@ import io.github.qauxv.base.annotation.UiItemAgentEntry;
 import io.github.qauxv.dsl.FunctionEntryRouter.Locations.Auxiliary;
 import io.github.qauxv.hook.CommonSwitchFunctionHook;
 import io.github.qauxv.util.QQVersion;
+import io.github.qauxv.util.SyncUtils;
 import io.github.qauxv.util.TIMVersion;
 import io.github.qauxv.util.dexkit.CBasePicDlProcessor;
 import io.github.qauxv.util.dexkit.CFlashPicHelper;
@@ -66,11 +67,11 @@ public class FlashPicHook extends CommonSwitchFunctionHook {
     private Method setTailMessage = null;
 
     private FlashPicHook() {
-        super(new DexKitTarget[]{
+        super(null, true, new DexKitTarget[]{
                 CFlashPicHelper.INSTANCE,
                 CBasePicDlProcessor.INSTANCE,
                 CItemBuilderFactory.INSTANCE
-        });
+        }, SyncUtils.PROC_MAIN);
     }
 
     public boolean isFlashPic(Object msgRecord) {

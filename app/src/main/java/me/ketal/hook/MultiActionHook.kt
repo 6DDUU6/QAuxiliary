@@ -75,14 +75,14 @@ import kotlin.concurrent.thread
 @FunctionHookEntry
 @UiItemAgentEntry
 object MultiActionHook : CommonSwitchFunctionHook(
-    arrayOf(
+    targets = arrayOf(
         CMessageCache,
         CMessageRecordFactory,
         NBaseChatPie_createMulti,
         CMultiMsgManager,
         MultiSelectToBottomIntent,
         MultiSelectBarVM,
-    )
+    ), defaultEnabled = true
 ), SessionHooker.IAIOParamUpdate {
 
     override val name = "批量撤回消息"

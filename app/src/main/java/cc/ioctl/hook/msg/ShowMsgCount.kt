@@ -63,6 +63,7 @@ object ShowMsgCount : CommonSwitchFunctionHook(
         AIOTitleVB_updateLeftTopBack_NT,
         NCustomWidgetUtil_updateCustomNoteTxt,
     ),
+    defaultEnabled = true,
     targetProc = SyncUtils.PROC_ANY
 ) {
 

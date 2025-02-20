@@ -39,6 +39,7 @@ import com.tencent.qphone.base.remote.FromServiceMsg;
 import com.tencent.qqnt.kernel.nativeinterface.PicElement;
 import com.xiaoniu.dispatcher.OnMenuBuilder;
 import com.xiaoniu.util.ContextUtils;
+import io.github.qauxv.util.SyncUtils;
 import io.github.qauxv.util.xpcompat.XC_MethodHook;
 import io.github.qauxv.util.xpcompat.XposedBridge;
 import io.github.qauxv.util.xpcompat.XposedHelpers;
@@ -69,7 +70,7 @@ public class PicMd5Hook extends CommonSwitchFunctionHook implements OnMenuBuilde
     public static final PicMd5Hook INSTANCE = new PicMd5Hook();
 
     private PicMd5Hook() {
-        super(new DexKitTarget[]{AbstractQQCustomMenuItem.INSTANCE});
+        super(null, true, new DexKitTarget[]{AbstractQQCustomMenuItem.INSTANCE}, SyncUtils.PROC_MAIN);
     }
 
     public static String rkey_group;

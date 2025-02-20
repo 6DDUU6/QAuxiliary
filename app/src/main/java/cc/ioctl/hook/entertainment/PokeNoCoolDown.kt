@@ -33,7 +33,7 @@ import io.github.qauxv.util.requireMinQQVersion
 
 @FunctionHookEntry
 @UiItemAgentEntry
-object PokeNoCoolDown : CommonSwitchFunctionHook(arrayOf(PaiYiPaiHandler_canSendReq)) {
+object PokeNoCoolDown : CommonSwitchFunctionHook(targets = arrayOf(PaiYiPaiHandler_canSendReq), defaultEnabled = true) {
 
     override val name = "去除戳一戳时间限制"
 

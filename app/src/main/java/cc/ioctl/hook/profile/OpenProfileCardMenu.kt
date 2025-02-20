@@ -44,7 +44,8 @@ import xyz.nextalone.util.throwOrTrue
 @FunctionHookEntry
 @UiItemAgentEntry
 object OpenProfileCardMenu : CommonSwitchFunctionHook(
-    targets = arrayOf(RecentPopup_onClickAction)
+    targets = arrayOf(RecentPopup_onClickAction),
+    defaultEnabled = true
 ) {
     override val name = "打开资料卡"
     override val description = "在首页加号菜单中添加打开资料卡功能"

@@ -26,6 +26,7 @@ import androidx.annotation.NonNull;
 import cc.ioctl.util.HookUtils;
 import cc.ioctl.util.HostInfo;
 import cc.ioctl.util.Reflex;
+import io.github.qauxv.util.SyncUtils;
 import io.github.qauxv.util.xpcompat.XC_MethodHook;
 import io.github.qauxv.util.xpcompat.XposedHelpers;
 import io.github.qauxv.base.annotation.FunctionHookEntry;
@@ -49,7 +50,7 @@ public class UploadTransparentAvatar extends CommonSwitchFunctionHook {
     public static final UploadTransparentAvatar INSTANCE = new UploadTransparentAvatar();
 
     private UploadTransparentAvatar() {
-        super(new DexKitTarget[]{NVipUtils_getPrivilegeFlags.INSTANCE});
+        super(null, true, new DexKitTarget[]{NVipUtils_getPrivilegeFlags.INSTANCE}, SyncUtils.PROC_MAIN);
     }
 
     @NonNull

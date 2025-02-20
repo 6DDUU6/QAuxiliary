@@ -70,7 +70,7 @@ public class CardMsgSender extends BaseSwitchFunctionDecorator implements IInput
     public static final CardMsgSender INSTANCE = new CardMsgSender();
 
     private CardMsgSender() {
-        super("qn_send_card_msg", false, new DexKitTarget[]{
+        super("qn_send_card_msg", true, new DexKitTarget[]{
                 CArkAppItemBubbleBuilder.INSTANCE,
                 CFaceDe.INSTANCE,
                 NBaseChatPie_init.INSTANCE,

@@ -52,7 +52,7 @@ import java.lang.reflect.Array
 
 @FunctionHookEntry
 @UiItemAgentEntry
-object CopyCardMsg : CommonSwitchFunctionHook("CopyCardMsg::BaseChatPie", arrayOf(CArkAppItemBubbleBuilder, AbstractQQCustomMenuItem)), OnMenuBuilder {
+object CopyCardMsg : CommonSwitchFunctionHook("CopyCardMsg::BaseChatPie", true, arrayOf(CArkAppItemBubbleBuilder, AbstractQQCustomMenuItem)), OnMenuBuilder {
 
     override val name = "复制卡片消息"
 

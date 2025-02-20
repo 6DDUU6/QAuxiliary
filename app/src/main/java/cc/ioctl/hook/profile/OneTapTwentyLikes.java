@@ -45,6 +45,7 @@ public class OneTapTwentyLikes extends CommonSwitchFunctionHook {
     public static final OneTapTwentyLikes INSTANCE = new OneTapTwentyLikes();
 
     private OneTapTwentyLikes() {
+        super(true);
     }
 
     @NonNull

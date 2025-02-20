@@ -34,7 +34,7 @@ import xyz.nextalone.util.isPublic
 
 @FunctionHookEntry
 @UiItemAgentEntry
-object RemoveSelectedMedia : CommonSwitchFunctionHook() {
+object RemoveSelectedMedia : CommonSwitchFunctionHook(defaultEnabled = true) {
 
     override val name = "移除选择媒体限制"
     override val description = "移除最多只能选择20张图片/视频限制"

@@ -35,7 +35,7 @@ import io.github.qauxv.util.Initiator
 
 @FunctionHookEntry
 @UiItemAgentEntry
-object ForceEnableMultiForward : CommonSwitchFunctionHook() {
+object ForceEnableMultiForward : CommonSwitchFunctionHook(defaultEnabled = true) {
     override val name = "转发时强制开启多选用户/群组"
 
     override val uiItemLocation = FunctionEntryRouter.Locations.Auxiliary.MESSAGE_CATEGORY
