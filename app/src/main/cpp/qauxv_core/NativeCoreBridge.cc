@@ -426,6 +426,7 @@ void qauxv::InitializeNativeHookApi(bool allowHookLinker) {
             }
         }
     } else {
+        sNativeHookHandle.hookFunction((void *)fopen, (void *)fake_fopen, (void **)&orig_fopen);
         LOGD("initNativeCore: native hook function is not null, use it directly");
     }
     sIsNativeHookInitialized = true;
