@@ -38,7 +38,6 @@
 #include <cstdio>
 #include <iostream>
 #include <fstream>
-#include <link.h>
 
 #include "HostInfo.h"
 #include "utils/JniUtils.h"

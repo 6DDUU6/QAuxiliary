@@ -4,29 +4,17 @@ import static io.github.qauxv.util.HostInfo.requireMinQQVersion;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import cc.ioctl.util.HookUtils;
-import com.akashi.protobuf.EmosmPb;
-import com.google.gson.Gson;
-import de.robv.android.xposed.XposedBridge;
 import io.github.qauxv.base.annotation.FunctionHookEntry;
 import io.github.qauxv.base.annotation.UiItemAgentEntry;
 import io.github.qauxv.dsl.FunctionEntryRouter;
 import io.github.qauxv.hook.CommonSwitchFunctionHook;
-import io.github.qauxv.util.Initiator;
 import io.github.qauxv.util.QQVersion;
-import io.github.qauxv.util.SyncUtils;
-import io.github.qauxv.util.dexkit.DexKit;
-import io.github.qauxv.util.dexkit.DexKitTarget;
-import io.github.qauxv.util.dexkit.EmoticonHandler_handleSmallEmotion;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 
 @FunctionHookEntry
 @UiItemAgentEntry
 public class FixEnvironment extends CommonSwitchFunctionHook {
     private FixEnvironment() {
-        super(SyncUtils.PROC_MAIN, new DexKitTarget[]{EmoticonHandler_handleSmallEmotion.INSTANCE});
+        super(true);
     }
 
     @NonNull
