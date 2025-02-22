@@ -279,16 +279,10 @@ int Hooked_dl_iterate_phdr(int (*__callback)(struct dl_phdr_info*, size_t, void*
     return Orig_dl_iterate_phdr(__proxy_callback, &proxy_data);
 }
 
-int (*Orig_getuid)();
-
-int fake_getuid() {
-    return 11451;
-}
-
 extern "C" JNIEXPORT jboolean JNICALL
 Java_cc_ioctl_hook_experimental_FixEnvironment_nativeInitEnvironmentHook(JNIEnv* env, jobject thiz) {
     qauxv::CreateInlineHook((void*) dl_iterate_phdr, (void*) Hooked_dl_iterate_phdr, (void**) &Orig_dl_iterate_phdr);
-    qauxv::CreateInlineHook((void*) getuid, (void*) fake_getuid, (void**) &Orig_getuid);
+    //qauxv::CreateInlineHook((void*) getuid, (void*) fake_getuid, (void**) &Orig_getuid);
     return true;
 }
 

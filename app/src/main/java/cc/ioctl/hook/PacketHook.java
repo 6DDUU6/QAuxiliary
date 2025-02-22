@@ -23,6 +23,7 @@
 package cc.ioctl.hook;
 
 import static de.robv.android.xposed.XposedBridge.log;
+import static io.github.qauxv.util.HostInfo.getHostInfo;
 import static io.github.qauxv.util.Initiator.load;
 
 import android.content.Context;
@@ -34,7 +35,9 @@ import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 
 import io.github.qauxv.util.McHookStatus;
+import java.io.File;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Random;
@@ -612,6 +615,18 @@ public class PacketHook {
     }
 
     public void checkAndInit(Context ctx) {
+        XposedHelpers.findAndHookMethod(load("java.io.File"), "canRead", new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                File file = (File) param.thisObject;
+                boolean result = (boolean) param.getResult();
+                if (file.toString().contains(getHostInfo().getPackageName() + "\\..") ||
+                        file.toString().contains(getHostInfo().getPackageName() + "/..")
+                ) {
+                    param.setResult(false);
+                }
+            }
+        });
         if (McHookStatus.getOpenStatus() == 1) {
             disableNewMSF(ctx);
             initOnce();
