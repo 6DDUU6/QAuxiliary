@@ -21,7 +21,7 @@ import java.lang.reflect.Method;
 public class FixEnvironment extends CommonSwitchFunctionHook {
 
     private FixEnvironment() {
-        super(null, true, null, SyncUtils.PROC_MAIN | SyncUtils.PROC_MSF);
+        super(null, true, null, SyncUtils.PROC_MSF);
     }
 
     @NonNull
