@@ -21,7 +21,7 @@ import java.lang.reflect.Method;
 public class FixEnvironment extends CommonSwitchFunctionHook {
 
     private FixEnvironment() {
-        super(null, true, null, SyncUtils.PROC_ANY);
+        super(null, true, null, SyncUtils.PROC_MAIN | SyncUtils.PROC_MSF);
     }
 
     @NonNull
@@ -60,7 +60,6 @@ public class FixEnvironment extends CommonSwitchFunctionHook {
             ) {
                 param.setResult(false);
             }
-            XposedBridge.log("file:" + file + " canRead result:" + result);
         });
         nativeInitEnvironmentHook();
         return true;
