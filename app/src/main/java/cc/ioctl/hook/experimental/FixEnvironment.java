@@ -51,16 +51,6 @@ public class FixEnvironment extends CommonSwitchFunctionHook {
 
     @Override
     public boolean initOnce() throws Exception {
-        Method method = File.class.getDeclaredMethod("canRead");
-        HookUtils.hookAfterIfEnabled(this, method, param -> {
-            File file = (File) param.thisObject;
-            boolean result = (boolean) param.getResult();
-            if (file.toString().contains(getHostInfo().getPackageName() + "\\..") ||
-                    file.toString().contains(getHostInfo().getPackageName() + "/..")
-            ) {
-                param.setResult(false);
-            }
-        });
         nativeInitEnvironmentHook();
         return true;
     }
