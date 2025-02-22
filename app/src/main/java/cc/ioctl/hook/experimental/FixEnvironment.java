@@ -54,9 +54,10 @@ public class FixEnvironment extends CommonSwitchFunctionHook {
         Method method = File.class.getDeclaredMethod("canRead");
         HookUtils.hookAfterIfEnabled(this, method, param -> {
             File file = (File) param.thisObject;
-            XposedBridge.log("file name:" + file.toString());
-            if (file.toString().contains(getHostInfo().getPackageName() + "\\..")) {
-                XposedBridge.log("file false:" + file.toString());
+            if (file.toString().contains(getHostInfo().getPackageName() + "\\..") ||
+                    file.toString().contains(getHostInfo().getPackageName() + "/..")
+            ) {
+                XposedBridge.log("file canRead false:" + file);
                 param.setResult(false);
             }
         });
