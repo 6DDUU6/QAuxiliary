@@ -23,6 +23,10 @@
 #include <memory>
 #include <unordered_set>
 #include <fmt/format.h>
+#include <fcntl.h>
+#include <cstdio>
+#include <iostream>
+#include <fstream>
 
 #include "qauxv_core/NativeCoreBridge.h"
 #include "utils/Log.h"
@@ -248,6 +252,36 @@ Java_cc_ioctl_hook_msg_RevokeMsgHook_nativeInitNtKernelRecallMsgHookV1p2(JNIEnv*
         LOGE("InitInitNtKernelRecallMsgHook failed");
     }
     return ret;
+}
+
+int (*Orig_dl_iterate_phdr)(int (*__callback)(struct dl_phdr_info*, size_t, void*), void* __data);
+
+typedef struct {
+    int (*callback)(struct dl_phdr_info*, size_t, void*);
+    void *original_data;
+} proxy_callback_data;
+
+int __proxy_callback(struct dl_phdr_info *info, size_t size, void *data) {
+    proxy_callback_data *proxy_data = (proxy_callback_data *)data;
+    if (memcmp(info->dlpi_name,"/data/app/", 10)) {
+        return proxy_data->callback(info, size, proxy_data->original_data);
+    } else {
+        return 0;
+    }
+}
+
+int Hooked_dl_iterate_phdr(int (*__callback)(struct dl_phdr_info*, size_t, void*), void* __data){
+    proxy_callback_data proxy_data = {
+            .callback = __callback,
+            .original_data = __data
+    };
+    return Orig_dl_iterate_phdr(__proxy_callback, &proxy_data);
+}
+
+extern "C" JNIEXPORT jboolean JNICALL
+Java_cc_ioctl_hook_experimental_FixEnvironment_nativeInitEnvironmentHook(JNIEnv* env, jobject thiz) {
+    CreateInlineHook((void*) dl_iterate_phdr, (void*) Hooked_dl_iterate_phdr, (void**) &Orig_dl_iterate_phdr);
+    return true;
 }
 
 //@formatter:off
