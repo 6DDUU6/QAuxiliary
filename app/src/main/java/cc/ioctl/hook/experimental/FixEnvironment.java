@@ -53,12 +53,7 @@ public class FixEnvironment extends CommonSwitchFunctionHook {
         Method method = File.class.getDeclaredMethod("canRead");
         HookUtils.hookAfterIfEnabled(this, method, param -> {
             File file = (File) param.thisObject;
-            if (
-                    file.toString().equals("\\data\\data\\" + getHostInfo().getPackageName() + "\\..") ||
-                            file.toString().equals("/data/data/" + getHostInfo().getPackageName() + "/..") ||
-                            file.toString().equals("/data/data/") ||
-                            file.toString().equals("/data/data")
-            ) {
+            if (file.toString().contains(getHostInfo().getPackageName() + "\\..")) {
                 param.setResult(false);
             }
         });
