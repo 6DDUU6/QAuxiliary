@@ -279,9 +279,23 @@ int Hooked_dl_iterate_phdr(int (*__callback)(struct dl_phdr_info*, size_t, void*
     return Orig_dl_iterate_phdr(__proxy_callback, &proxy_data);
 }
 
+int (*orig_faccessat)(int __dirfd, const char* _Nonnull __path, int __mode, int __flags);
+
+int fake_faccessat(int dirfd, const char* path, int mode, int flags) {
+    if (strstr(path, "/data/data/com.tencent.mobileqq/..")) {
+        return -1;
+    }
+    if (strstr(path, "/data/data/com.tencent.mobileqq")) {
+        return 0;
+    }
+    int ret = orig_faccessat(dirfd, path, mode, flags);
+    return ret;
+}
+
 extern "C" JNIEXPORT jboolean JNICALL
 Java_cc_ioctl_hook_experimental_FixEnvironment_nativeInitEnvironmentHook(JNIEnv* env, jobject thiz) {
     qauxv::CreateInlineHook((void*) dl_iterate_phdr, (void*) Hooked_dl_iterate_phdr, (void**) &Orig_dl_iterate_phdr);
+    qauxv::CreateInlineHook((void*) faccessat, (void*) fake_faccessat, (void**) &orig_faccessat);
     //qauxv::CreateInlineHook((void*) getuid, (void*) fake_getuid, (void**) &Orig_getuid);
     return true;
 }

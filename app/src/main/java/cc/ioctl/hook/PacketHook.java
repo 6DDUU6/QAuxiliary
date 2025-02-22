@@ -615,18 +615,6 @@ public class PacketHook {
     }
 
     public void checkAndInit(Context ctx) {
-        XposedHelpers.findAndHookMethod(load("java.io.File"), "canRead", new XC_MethodHook() {
-            @Override
-            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                File file = (File) param.thisObject;
-                boolean result = (boolean) param.getResult();
-                if (file.toString().contains(getHostInfo().getPackageName() + "\\..") ||
-                        file.toString().contains(getHostInfo().getPackageName() + "/..")
-                ) {
-                    param.setResult(false);
-                }
-            }
-        });
         if (McHookStatus.getOpenStatus() == 1) {
             disableNewMSF(ctx);
             initOnce();
