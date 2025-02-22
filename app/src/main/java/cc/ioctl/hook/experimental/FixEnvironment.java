@@ -6,6 +6,7 @@ import static io.github.qauxv.util.HostInfo.requireMinQQVersion;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import cc.ioctl.util.HookUtils;
+import de.robv.android.xposed.XposedBridge;
 import io.github.qauxv.base.annotation.FunctionHookEntry;
 import io.github.qauxv.base.annotation.UiItemAgentEntry;
 import io.github.qauxv.dsl.FunctionEntryRouter;
@@ -53,7 +54,9 @@ public class FixEnvironment extends CommonSwitchFunctionHook {
         Method method = File.class.getDeclaredMethod("canRead");
         HookUtils.hookAfterIfEnabled(this, method, param -> {
             File file = (File) param.thisObject;
+            XposedBridge.log("file name:" + file.toString());
             if (file.toString().contains(getHostInfo().getPackageName() + "\\..")) {
+                XposedBridge.log("file false:" + file.toString());
                 param.setResult(false);
             }
         });
