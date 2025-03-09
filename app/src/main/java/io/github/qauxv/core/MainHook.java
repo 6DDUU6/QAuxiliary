@@ -48,6 +48,7 @@ import cc.ioctl.hook.ui.misc.OptXListViewScrollBar;
 import cc.ioctl.hook.ui.title.RemoveCameraButton;
 import cc.ioctl.util.HostInfo;
 import cc.ioctl.util.Reflex;
+import io.github.qauxv.chainloader.detail.ExternalModuleChainLoader;
 import io.github.qauxv.util.xpcompat.XC_MethodHook;
 import io.github.qauxv.util.xpcompat.XposedBridge;
 import io.github.qauxv.config.ConfigItems;
@@ -176,6 +177,10 @@ public class MainHook {
             }
         }
         PacketHook.INSTANCE.checkAndInit(ctx);
+        // load external modules, if any
+        if (!safeMode) {
+            ExternalModuleChainLoader.loadExternalModulesForStartup();
+        }
     }
 
     private static boolean isForegroundStartupForMainProcess(Context ctx, Object step) {
