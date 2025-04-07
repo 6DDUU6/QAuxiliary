@@ -27,6 +27,7 @@ import static io.github.qauxv.util.HostInfo.getHostInfo;
 import static io.github.qauxv.util.Initiator.load;
 
 import android.content.Context;
+import cc.ioctl.util.HostInfo;
 import cc.ioctl.util.HttpUtil;
 import com.google.gson.Gson;
 import com.qq.taf.jce.HexUtil;
@@ -35,6 +36,7 @@ import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 
 import io.github.qauxv.util.McHookStatus;
+import io.github.qauxv.util.QQVersion;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -364,10 +366,7 @@ public class PacketHook {
             // 执行方法之后执行的方法
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                if (!isInit) {
-                    hookReceivePacketNew(param);
-                    isInit = true;
-                }
+                hookReceivePacketNew(param);
             }
         };
         XC_MethodHook encodeRequest = new XC_MethodHook() {
@@ -377,8 +376,12 @@ public class PacketHook {
                 hookSendPacketNew(param);
             }
         };
-
-        XposedBridge.hookAllMethods(clazz, "onMSFPacketState", onReceData);
+        if (HostInfo.requireMinQQVersion(QQVersion.QQ_9_1_55_BETA_23850)) {
+            Class clz = load("com.tencent.mobileqq.msf.core.f0.c.b$e");
+            XposedBridge.hookAllMethods(clz, "onMSFPacketState", onReceData);
+        } else {
+            XposedBridge.hookAllMethods(clazz, "onMSFPacketState", onReceData);
+        }
         XposedBridge.hookAllMethods(clazz, "sendPacket", encodeRequest);
     }
 
@@ -616,7 +619,7 @@ public class PacketHook {
 
     public void checkAndInit(Context ctx) {
         if (McHookStatus.getOpenStatus() == 1) {
-            disableNewMSF(ctx);
+            //disableNewMSF(ctx);
             initOnce();
         }
         if (McHookStatus.getCryptStatus() == 1) {
@@ -754,7 +757,7 @@ public class PacketHook {
             log("开始禁用新版msf");
             Class clz = load("com.tencent.mobileqq.msf.core.f0.b");
             if (clz == null) {
-                log("McHookTool: msf.core.f0.b isnull");
+                log("McHookTool: msf.core isnull");
             }
             XC_MethodHook disableMSF = new XC_MethodHook() {
                 @Override
