@@ -21,6 +21,15 @@
         "com.google.guava:guava"
       ],
       "versioning": "regex:^(?<major>\\d+)(\\.(?<minor>\\d+))?(\\.(?<patch>\\d+))?(-(?<compatibility>.*))?$"
+    },
+    {
+      "matchPackageNames": [
+        "com.android.library",
+        "com.android.application",
+        "com.android.tools.build:gradle",
+        "com.google.flatbuffers:flatbuffers-java"
+      ],
+      "enabled": false
     }
   ]
 }
