@@ -376,7 +376,11 @@ public class PacketHook {
                 hookSendPacketNew(param);
             }
         };
-        if (HostInfo.requireMinQQVersion(QQVersion.QQ_9_1_55_BETA_23850)) {
+        int versionCode = HostInfo.getVersionCode();
+        if (versionCode >= QQVersion.QQ_9_1_90_BETA) {
+            Class clz = load("com.tencent.mobileqq.msf.core.e0.c.b$e");
+            XposedBridge.hookAllMethods(clz, "onMSFPacketState", onReceData);
+        } else if (versionCode >= QQVersion.QQ_9_1_55_BETA_23850) {
             Class clz = load("com.tencent.mobileqq.msf.core.f0.c.b$e");
             XposedBridge.hookAllMethods(clz, "onMSFPacketState", onReceData);
         } else {
@@ -770,7 +774,21 @@ public class PacketHook {
                     }
                 }
             };
+            Class c = load("com.tencent.freesia.UnitedConfig");
+            if (c == null) {
+                log("McHookTool: UnitedConfig isnull");
+            }
+            XC_MethodHook disableSwitch = new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    String tag = (String) param.args[1];
+                    if ("msf_init_optimize".equals(tag) || "msf_network_service_switch_new".equals(tag)) {
+                        param.setResult(false);
+                    }
+                }
+            };
             XposedBridge.hookAllMethods(clz, "a", disableMSF);
+            XposedBridge.hookAllMethods(c, "isSwitchOn", disableSwitch);
             return true;
         } catch (Throwable e) {
             log(e);
