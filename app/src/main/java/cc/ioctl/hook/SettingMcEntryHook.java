@@ -50,6 +50,7 @@ import io.github.qauxv.core.HookInstaller;
 import io.github.qauxv.fragment.FuncStatusDetailsFragment;
 import io.github.qauxv.lifecycle.Parasitics;
 import io.github.qauxv.util.Initiator;
+import io.github.qauxv.util.QQVersion;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -195,7 +196,13 @@ public class SettingMcEntryHook extends BasePersistBackgroundHook {
                 }
                 setOnClickListener = candidates.get(0);
             }
-            Constructor<?> ctorSimpleItemProcessor = kSimpleItemProcessor.getDeclaredConstructor(Context.class, int.class, CharSequence.class, int.class);
+            Constructor<?> ctorSimpleItemProcessor = null;
+            if (HostInfo.getVersionCode() >= QQVersion.QQ_9_1_90_BETA) {
+                ctorSimpleItemProcessor = kSimpleItemProcessor.getDeclaredConstructor(Context.class, int.class, CharSequence.class, int.class, String.class);
+            } else {
+                ctorSimpleItemProcessor = kSimpleItemProcessor.getDeclaredConstructor(Context.class, int.class, CharSequence.class, int.class);
+            }
+            Constructor<?> finalCtorSimpleItemProcessor = ctorSimpleItemProcessor;
             io.github.qauxv.util.xpcompat.XC_MethodHook callback = HookUtils.afterAlways(this, 50, param -> {
                 List<Object> result = (List<Object>) param.getResult();
                 Context ctx = (Context) param.args[0];
@@ -204,7 +211,12 @@ public class SettingMcEntryHook extends BasePersistBackgroundHook {
                 Parasitics.injectModuleResources(ctx.getResources());
                 @SuppressLint("DiscouragedApi")
                 int resId = ctx.getResources().getIdentifier("qui_tuning", "drawable", ctx.getPackageName());
-                Object entryItem = ctorSimpleItemProcessor.newInstance(ctx, R.id.setting2Activity_settingEntryItem, "McHookTool", resId);
+                Object entryItem = null;
+                if (HostInfo.getVersionCode() >= QQVersion.QQ_9_1_90_BETA) {
+                    entryItem = finalCtorSimpleItemProcessor.newInstance(ctx, R.id.setting2Activity_settingEntryItem, "McHookTool", resId, "McHookTool");
+                } else {
+                    entryItem = finalCtorSimpleItemProcessor.newInstance(ctx, R.id.setting2Activity_settingEntryItem, "McHookTool", resId);
+                }
                 Class<?> thatFunction0 = setOnClickListener.getParameterTypes()[0];
                 Object theUnit = thatFunction0.getClassLoader().loadClass("kotlin.Unit").getField("INSTANCE").get(null);
                 ClassLoader hostClassLoader = Initiator.getHostClassLoader();
