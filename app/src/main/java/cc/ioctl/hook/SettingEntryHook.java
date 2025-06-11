@@ -52,7 +52,6 @@ import io.github.qauxv.lifecycle.Parasitics;
 import io.github.qauxv.util.Initiator;
 import io.github.qauxv.util.LicenseStatus;
 import io.github.qauxv.util.Log;
-import io.github.qauxv.util.QQVersion;
 import io.github.qauxv.util.xpcompat.XC_MethodHook;
 import io.github.qauxv.util.xpcompat.XposedBridge;
 import io.github.qauxv.util.xpcompat.XposedHelpers;
@@ -172,13 +171,26 @@ public class SettingEntryHook extends BasePersistBackgroundHook {
                 // take the smaller one
                 setOnClickListener = candidates.get(0);
             }
-            Constructor<?> ctorSimpleItemProcessor = null;
-            if (HostInfo.getVersionCode() >= QQVersion.QQ_9_1_90_BETA) {
-                ctorSimpleItemProcessor = kSimpleItemProcessor.getDeclaredConstructor(Context.class, int.class, CharSequence.class, int.class, String.class);
-            } else {
-                ctorSimpleItemProcessor = kSimpleItemProcessor.getDeclaredConstructor(Context.class, int.class, CharSequence.class, int.class);
+            Constructor<?> ctorSimpleItemProcessor;
+            int ctorSimpleItemProcessorArgc;
+            {
+                Constructor<?> c = null;
+                int i = 0;
+                try {
+                    // Since version QQ version X, where X <= 9.1.91.266545 (10298). I didn't attempt to find the exact value of X.
+                    // tianshuPath : String? = null
+                    c = kSimpleItemProcessor.getDeclaredConstructor(Context.class, int.class, CharSequence.class, int.class,
+                            String.class);
+                    i = 5;
+                } catch (NoSuchMethodException ignored) {
+                }
+                if (c == null) {
+                    c = kSimpleItemProcessor.getDeclaredConstructor(Context.class, int.class, CharSequence.class, int.class);
+                    i = 4;
+                }
+                ctorSimpleItemProcessor = c;
+                ctorSimpleItemProcessorArgc = i;
             }
-            Constructor<?> finalCtorSimpleItemProcessor = ctorSimpleItemProcessor;
             XC_MethodHook callback = HookUtils.afterAlways(this, 50, param -> {
                 List<Object> result = (List<Object>) param.getResult();
                 Context ctx = (Context) param.args[0];
@@ -187,11 +199,11 @@ public class SettingEntryHook extends BasePersistBackgroundHook {
                 Parasitics.injectModuleResources(ctx.getResources());
                 @SuppressLint("DiscouragedApi")
                 int resId = ctx.getResources().getIdentifier("qui_tuning", "drawable", ctx.getPackageName());
-                Object entryItem = null;
-                if (HostInfo.getVersionCode() >= QQVersion.QQ_9_1_90_BETA) {
-                    entryItem = finalCtorSimpleItemProcessor.newInstance(ctx, R.id.setting2Activity_settingEntryItem, "QAuxiliary", resId, "QAuxiliary");
+                Object entryItem;
+                if (ctorSimpleItemProcessorArgc == 5) {
+                    entryItem = ctorSimpleItemProcessor.newInstance(ctx, R.id.setting2Activity_settingEntryItem, "QAuxiliary", resId, null);
                 } else {
-                    entryItem = finalCtorSimpleItemProcessor.newInstance(ctx, R.id.setting2Activity_settingEntryItem, "QAuxiliary", resId);
+                    entryItem = ctorSimpleItemProcessor.newInstance(ctx, R.id.setting2Activity_settingEntryItem, "QAuxiliary", resId);
                 }
                 Class<?> thatFunction0 = setOnClickListener.getParameterTypes()[0];
                 Object theUnit = thatFunction0.getClassLoader().loadClass("kotlin.Unit").getField("INSTANCE").get(null);
