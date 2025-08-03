@@ -31,6 +31,7 @@ import com.android.tools.build.apkzlib.zip.CompressionMethod
 import com.android.tools.build.apkzlib.zip.ZFile
 import com.android.tools.build.apkzlib.zip.ZFileOptions
 import org.jetbrains.changelog.markdownToHTML
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.FileInputStream
 import java.security.KeyStore
@@ -157,7 +158,6 @@ android {
             isShrinkResources = false
             isMinifyEnabled = true
             proguardFiles("proguard-rules.pro")
-            kotlinOptions.suppressWarnings = true
             val ltoCacheFlags = listOf(
                 "-flto=thin",
                 "-Wl,--thinlto-cache-policy,cache_size_bytes=300m",
@@ -273,6 +273,19 @@ android {
     }
     // not use embedded dex
     packagingOptions.dex.useLegacyPackaging = true
+
+    /**
+     * There's some issues with the lint of AGP [8.9.x-8.11.1], causing the ':app:lintVitalAnalyzeRelease' task to fail.
+     * Unexpected failure during lint analysis (this is a bug in lint or one of the libraries it depends on)
+     * Message: Unexpected failure during lint analysis (this is a bug in lint or one of the libraries it depends on)
+     * Message: Unexpected failure during lint analysis of QSecO3AddRiskRequestMitigation.kt (this is a bug in lint or one of the libraries it depends on)
+     * Message: Incorrect type 'com/tencent/mobileqq/profilecard/base/framework/impl/AbsComponent' (JDK_24)
+     * The crash seems to involve the detector \\\`com.android.tools.lint.checks.PrivateApiDetector\\\`.
+     * You can try disabling it with something like this:
+     */
+    lint {
+        disable += arrayOf("BlockedPrivateApi", "DiscouragedPrivateApi", "PrivateApi", "SoonBlockedPrivateApi")
+    }
 }
 
 kotlin {
@@ -559,8 +572,8 @@ protobuf {
 
 // force kotlin to produce java 11 class files
 tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        jvmTarget = "11"
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_11
     }
 }
 
