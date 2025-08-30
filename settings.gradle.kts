@@ -50,7 +50,7 @@ dependencyResolutionManagement {
 includeBuild("build-logic")
 
 plugins {
-    id("com.gradle.develocity") version "4.0.2"
+    id("com.gradle.develocity") version "4.1.1"
     id("org.gradle.toolchains.foojay-resolver-convention") version ("1.0.0")
 }
 
@@ -77,7 +77,7 @@ include(
     ":libs:ksp",
     ":libs:mmkv",
     ":libs:dexkit",
-    ":libs:ezXHelper",
+    ":libs:ezxhelper",
     ":libs:xView",
     ":libs:libxposed:api",
     ":libs:libxposed:service",
