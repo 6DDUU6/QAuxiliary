@@ -43,6 +43,7 @@ import me.hd.hook.menu.RepeatToImg
 import me.ketal.hook.PicCopyToClipboard
 import me.qcuncle.hook.TranslateTextMsg
 import top.xunflash.hook.MiniAppDirectJump
+import xyz.nextalone.util.hookAfterAllConstructors
 import java.lang.reflect.Method
 
 @FunctionHookEntry
@@ -75,16 +76,16 @@ object MenuBuilderHook : BasePersistBackgroundHook() {
             val listMethodName: String = baseContentComponentClass.declaredMethods.first {
                 it.isAbstract && it.returnType == MutableList::class.java && it.parameterTypes.isEmpty()
             }.name
-            val targets = mutableSetOf<String>()
-            for (decorator in decorators) {
-                targets.addAll(decorator.targetComponentTypes)
-            }
-            for (target in targets) {
-                val targetClass = Initiator.loadClass(target)
-                HookUtils.hookAfterAlways(this, targetClass.getMethod(listMethodName), 48) {
+            val hookedClasses = mutableSetOf<Class<*>>()
+            baseContentComponentClass.hookAfterAllConstructors {
+                val class_ContentComponent = it.thisObject.javaClass
+                if (class_ContentComponent in hookedClasses) return@hookAfterAllConstructors
+                hookedClasses.add(class_ContentComponent)
+                val target = class_ContentComponent.name
+                HookUtils.hookAfterAlways(this, class_ContentComponent.getMethod(listMethodName), 48) {
                     val msg = getMsgMethod.invoke(it.thisObject)!!
                     for (decorator in decorators) {
-                        if (target in decorator.targetComponentTypes) {
+                        if (decorator.targetComponentTypes == null || target in decorator.targetComponentTypes!!) {
                             try {
                                 decorator.onGetMenuNt(msg, target, it)
                             } catch (e: Exception) {
@@ -100,8 +101,15 @@ object MenuBuilderHook : BasePersistBackgroundHook() {
 }
 
 interface OnMenuBuilder {
-    val targetComponentTypes: Array<String>
+    /**
+     * [com.tencent.mobileqq.aio.msglist.holder.component.BaseContentComponent] 的子类名
+     * null 表示所有
+     */
+    val targetComponentTypes: Array<String>?
 
+    /**
+     * 同一消息可能按照父类多次回调
+     */
     @Throws(Exception::class)
     fun onGetMenuNt(
         msg: Any,

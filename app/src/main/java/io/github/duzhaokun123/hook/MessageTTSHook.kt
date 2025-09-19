@@ -126,12 +126,11 @@ object MessageTTSHook : CommonSwitchFunctionHook(), OnMenuBuilder {
             }
         }
     }
-    override val targetComponentTypes = arrayOf(
-        "com.tencent.mobileqq.aio.msglist.holder.component.text.AIOTextContentComponent",
-        "com.tencent.mobileqq.aio.msglist.holder.component.reply.AIOReplyComponent",)
+    override val targetComponentTypes = null
 
     override fun onGetMenuNt(msg: Any, componentType: String, param: XC_MethodHook.MethodHookParam) {
         if (!isEnabled) return
+        if (param.thisObject.javaClass.name != componentType) return
         val item = CustomMenu.createItemIconNt(msg, "TTS", R.drawable.ic_item_tts_72dp, R.id.item_tts) {
             val ctx = ContextUtils.getCurrentActivity()
             val wc = CommonContextWrapper.createAppCompatContext(ctx)

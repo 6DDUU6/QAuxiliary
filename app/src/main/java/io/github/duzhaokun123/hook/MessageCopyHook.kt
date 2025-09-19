@@ -120,12 +120,11 @@ object MessageCopyHook : CommonSwitchFunctionHook(), OnMenuBuilder {
             .setTextIsSelectable(true)
     }
 
-    override val targetComponentTypes = arrayOf(
-        "com.tencent.mobileqq.aio.msglist.holder.component.text.AIOTextContentComponent",
-        "com.tencent.mobileqq.aio.msglist.holder.component.reply.AIOReplyComponent",)
+    override val targetComponentTypes = null
 
     override fun onGetMenuNt(msg: Any, componentType: String, param: XC_MethodHook.MethodHookParam) {
         if (!isEnabled) return
+        if (param.thisObject.javaClass.name != componentType) return
         val item = CustomMenu.createItemIconNt(msg, "自由复制", R.drawable.ic_item_copy_72dp, R.id.item_free_copy) {
             val text = try {
                 AIOMsgItem_getAccessibleText.invoke(msg) as String
