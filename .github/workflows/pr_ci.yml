@@ -38,7 +38,7 @@ jobs:
           git submodule foreach git submodule update --init --recursive
 
       - name: set up JDK 17
-        uses: actions/setup-java@v4.7.1
+        uses: actions/setup-java@v5.0.0
         with:
           java-version: '17'
           distribution: 'adopt'
@@ -52,7 +52,7 @@ jobs:
           ccache -o compiler_check='%compiler% -dumpmachine; %compiler% -dumpversion'
           ccache -zp
       - name: Cache Native Build
-        uses: actions/cache@v4.2.4
+        uses: actions/cache@v4.3.0
         with:
           path: |
             ~/.cache/ccache
@@ -68,11 +68,12 @@ jobs:
           mkdir -p "$ANDROID_HOME/licenses/"
           echo > "$ANDROID_HOME/licenses/android-sdk-license"
           echo -n 24333f8a63b6825ea9c5514f83c2829b004d1fee > "$ANDROID_HOME/licenses/android-sdk-license"
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null
           $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "cmake;3.31.0"
           echo "sdk.dir=${ANDROID_HOME}" > local.properties
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v3.5.0
+        uses: gradle/actions/setup-gradle@v5
 
       - name: Build with Gradle
         run: |

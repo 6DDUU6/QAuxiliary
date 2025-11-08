@@ -23,17 +23,18 @@
 package me.hd.hook
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.graphics.Color
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.RelativeLayout
-import android.widget.TextView
 import androidx.core.view.children
 import cc.hicore.message.chat.SessionHooker.IAIOParamUpdate
 import cc.hicore.message.chat.SessionUtils
+import cc.ioctl.util.LayoutHelper
 import com.github.kyuubiran.ezxhelper.utils.findMethod
 import com.github.kyuubiran.ezxhelper.utils.hookAfter
-import com.lxj.xpopup.util.XPopupUtils
 import io.github.qauxv.base.annotation.FunctionHookEntry
 import io.github.qauxv.base.annotation.UiItemAgentEntry
 import io.github.qauxv.dsl.FunctionEntryRouter
@@ -42,7 +43,7 @@ import io.github.qauxv.util.Initiator
 import io.github.qauxv.util.TIMVersion
 import io.github.qauxv.util.Toasts
 import io.github.qauxv.util.requireMinTimVersion
-import io.github.qauxv.ui.ResUtils
+import xyz.nextalone.util.getIdentifier
 
 @FunctionHookEntry
 @UiItemAgentEntry
@@ -52,13 +53,14 @@ object TimBarAddEssenceHook : CommonSwitchFunctionHook(), IAIOParamUpdate {
     override val uiItemLocation = FunctionEntryRouter.Locations.Auxiliary.MESSAGE_CATEGORY
     override val isAvailable = requireMinTimVersion(TIMVersion.TIM_4_0_95_BETA)
 
-    private val Layout_Id = "TimBarAddEssenceHook".hashCode()
-    private var AIOParam: Any? = null
-
     override val runtimeErrorDependentComponents = null
+
+    private var AIOParam: Any? = null
     override fun onAIOParamUpdate(param: Any?) {
-        this.AIOParam = param
+        AIOParam = param
     }
+
+    private val Layout_Id = "TimBarAddEssenceHook".hashCode()
 
     override fun initOnce(): Boolean {
         Initiator.loadClass("com.tencent.tim.aio.titlebar.TimRight1VB").findMethod {
@@ -66,26 +68,24 @@ object TimBarAddEssenceHook : CommonSwitchFunctionHook(), IAIOParamUpdate {
         }.hookAfter { param ->
             val view = param.result as View
             val rootView = view.parent as ViewGroup
+
             if (!rootView.children.map { it.id }.contains(Layout_Id)) {
-                val textView = TextView(view.context).apply {
-                    id = Layout_Id
-                    text = "精"
-                    textSize = 16f
-                    if (ResUtils.isInNightMode()) {
-                        setTextColor(Color.WHITE)
-                    } else {
-                        setTextColor(Color.BLACK)
-                    }
+                val imageView = ImageView(view.context).apply {
                     layoutParams = RelativeLayout.LayoutParams(
-                        RelativeLayout.LayoutParams.WRAP_CONTENT,
-                        RelativeLayout.LayoutParams.WRAP_CONTENT
+                        LayoutHelper.dip2px(context, 20f),
+                        LayoutHelper.dip2px(context, 20f)
                     ).apply {
                         addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
                         addRule(RelativeLayout.CENTER_VERTICAL)
-                        marginEnd = XPopupUtils.dp2px(view.context, 70f)
+                        marginEnd = LayoutHelper.dip2px(context, 70f)
                     }
+                    id = Layout_Id
+                    val iconResId = getIdentifier("drawable", "qui_tui_brand_products")!!
+                    setImageResource(iconResId)
+                    val night = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+                    setColorFilter(if (night) Color.WHITE else Color.BLACK)
                 }
-                textView.setOnClickListener {
+                imageView.setOnClickListener {
                     val contact = SessionUtils.AIOParam2Contact(AIOParam)
                     val troopUin = contact.peerUid
                     try {
@@ -104,7 +104,7 @@ object TimBarAddEssenceHook : CommonSwitchFunctionHook(), IAIOParamUpdate {
                         e.printStackTrace()
                     }
                 }
-                rootView.addView(textView)
+                rootView.addView(imageView)
             }
         }
         return true

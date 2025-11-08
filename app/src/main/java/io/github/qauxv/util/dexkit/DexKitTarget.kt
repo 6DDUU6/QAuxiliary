@@ -46,6 +46,10 @@ import io.github.qauxv.util.QQVersion
 import io.github.qauxv.util.requireMinQQVersion
 import me.ketal.data.ConfigData
 import mqq.app.AppRuntime
+import org.luckypray.dexkit.DexKitBridge
+import org.luckypray.dexkit.result.MethodData
+
+typealias DexKitBridgeFinder = (bridge: DexKitBridge) -> MethodData
 
 sealed class DexKitTarget {
     val version = HostInfo.getVersionCode32()
@@ -61,6 +65,16 @@ sealed class DexKitTarget {
     }
 
     sealed class UsingDexkit : DexKitTarget()
+
+    sealed class UsingDexKitBridge : DexKitTarget() {
+
+        /**
+         * 由于设计上的问题 即使是 findClass 也需要返回 class 中的一个 method
+         * 不能 findField
+         */
+        abstract val finder: DexKitBridgeFinder
+        override val filter = DexKitFilter.allowAll
+    }
 
     abstract val declaringClass: String
     open val findMethod: Boolean = false
@@ -743,7 +757,7 @@ data object AIO_Destroy_QQNT : DexKitTarget.UsingStringVector() {
 
 data object AIO_InputRootInit_QQNT : DexKitTarget.UsingStringVector() {
     override val findMethod: Boolean = true
-    override val traitStringVectors = arrayOf(arrayOf("binding", "inputRoot", "findViewById(...)", "getContext(...)", "sendBtn"))
+    override val traitStringVectors = arrayOf(arrayOf("binding", "inputRoot", "findViewById(...)", "getContext(...)", "sendBtn"), arrayOf("inputRoot.findViewById(R.id.send_btn)"))
     override val declaringClass = "com.tencent.mobileqq.aio.input.simpleui.AIOInputSimpleUIVBDelegate"
     override val filter = DexKitFilter.strInClsName("com/tencent/mobileqq/aio/input")
 }
@@ -757,8 +771,8 @@ data object EmoMsgUtils_isSingleLottie_QQNT : DexKitTarget.UsingStr() {
 }
 
 data object Reply_At_QQNT : DexKitTarget.UsingStr() {
-    override val findMethod: Boolean = false
-    override val traitString = arrayOf("InputReplyVMDelegate")
+    override val findMethod: Boolean = true
+    override val traitString = arrayOf("msgItem.msgRecord.senderUid")
     override val declaringClass = ""
     override val filter = DexKitFilter.strInClsName("com/tencent/mobileqq/aio/input")
 }
@@ -860,9 +874,9 @@ data object X5_Properties_conf : DexKitTarget.UsingStr() {
     override val filter = DexKitFilter.allowAll
 }
 
-data object EmotionDownloadEnableSwitch : DexKitTarget.UsingStringVector() {
+data object EmotionDownloadEnableSwitch : DexKitTarget.UsingStr() {
     override val findMethod = true
-    override val traitStringVectors = arrayOf(arrayOf("emotion_download_disable_8980_887036489", "…le_8980_887036489"))
+    override val traitString = arrayOf("emotion_download_disable_8980_887036489")
     override val declaringClass: String = ""
     override val filter = DexKitFilter.strInClsName("com/tencent/mobileqq/emotionintegrate/")
 }
@@ -1113,4 +1127,45 @@ data object PadUtil_getDeviceType : DexKitTarget.UsingStr() {
     override val traitString = arrayOf("context is null")
     override val declaringClass = ""
     override val filter = DexKitFilter.strInClsName("com/tencent/common/config/pad/PadUtil")
+}
+
+data object SharePanelSceneData : DexKitTarget.UsingStr() {
+    override val findMethod = false
+    override val traitString = arrayOf("SharePanelSceneData(sceneId=")
+    override val declaringClass = "com.tencent.mobileqq.sharepanel.config.SharePanelSceneData"
+    override val filter = DexKitFilter.strInClsName("com/tencent/mobileqq/sharepanel/config/")
+}
+
+data object SharePanel_Handler_OtherApp_openImageByOtherApp : DexKitTarget.UsingStringVector() {
+    override val findMethod = true
+    override val traitStringVectors = arrayOf(arrayOf("SharePanel_Handler_OtherApp", "openImageByOtherApp "))
+    override val declaringClass = "com.tencent.mobileqq.sharepanel.share.handler.SharePanel_Handler_OtherApp"
+    override val filter = DexKitFilter.strInClsName("com.tencent.mobileqq.sharepanel.share.handler")
+}
+
+data object SharePanel_Handler_OtherApp_openVideoByOtherApp : DexKitTarget.UsingStringVector() {
+    override val findMethod = true
+    override val traitStringVectors = arrayOf(arrayOf("SharePanel_Handler_OtherApp", "openVideoByOtherApp "))
+    override val declaringClass = "com.tencent.mobileqq.sharepanel.share.handler.SharePanel_Handler_OtherApp"
+    override val filter = DexKitFilter.strInClsName("com.tencent.mobileqq.sharepanel.share.handler")
+}
+
+data object AIOMsgItem_initContentDescription : DexKitTarget.UsingDexKitBridge() {
+    override val findMethod: Boolean = true
+    override val declaringClass = "com.tencent.mobileqq.aio.msg.AIOMsgItem"
+    override val finder: DexKitBridgeFinder  = { bridge ->
+        val method1 = bridge.findMethod {
+            matcher {
+                declaredClass("com.tencent.mobileqq.aio.msg.AIOMsgItem")
+                usingStrings("senderUid", "peerUid")
+            }
+        }.single()
+        bridge.findMethod {
+            matcher {
+                declaredClass("com.tencent.mobileqq.aio.msg.AIOMsgItem")
+                returnType(String::class.java)
+                addCaller(method1.descriptor)
+            }
+        }.single()
+    }
 }
